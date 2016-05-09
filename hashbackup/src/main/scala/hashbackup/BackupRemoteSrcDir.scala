@@ -5,6 +5,6 @@ import ammonite.ops._
 /**
   * A "backup source directory"; Can be local or remotely mounted
   */
-class BackupRemoteSrcDir extends BackupSrcDir {
+case class BackupRemoteSrcDir(dir : RelPath) extends BackupSrcDir(dir) {
 
 }

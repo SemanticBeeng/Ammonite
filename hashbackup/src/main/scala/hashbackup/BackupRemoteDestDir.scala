@@ -1,8 +1,8 @@
 package hashbackup
 
-import ammonite.ops.Path
+import ammonite.ops.RelPath
 
 /**
   * A "backup directory"
   */
-class BackupRemoteDestDir extends Path
+class BackupRemoteDestDir extends RelPath
