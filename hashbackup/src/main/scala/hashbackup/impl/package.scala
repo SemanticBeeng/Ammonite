@@ -1,25 +1,63 @@
 package hashbackup
 
-import ammonite.ops.RelPath
+import ammonite.ops.{Path, RelPath}
+import hashbackup.intf.BackDestType.BackupDestVal
+import hashbackup.intf.BackupDestination
 
 /**
   *
   */
 package object impl {
 
-  case class BackupSrcDir(dir : RelPath) extends intf.BackupSrcDir {
+  case class BackupSrcDir(path : RelPath)
+    extends intf.BackupSrcDir {
   }
 
-  case class BackupLocalDir(dir : RelPath) extends intf.BackupLocalDir {
-
-  }
-
-  case class BackupRemoteSrcDir(dir : RelPath) extends intf.BackupRemoteSrcDir {
-
-  }
-
-  case class BackupRemoteDestDir(dir: RelPath) extends intf.BackupRemoteDestDir {
+  case class BackupLocalDir(path : RelPath)
+    extends intf.BackupLocalDir {
 
   }
 
+  case class BackupRemoteSrcDir(path : RelPath)
+    extends intf.BackupRemoteSrcDir {
+
+  }
+
+  case class BackupRemoteDestDir(path: RelPath)
+    extends intf.BackupRemoteDestDir {
+
+  }
+  /**
+    *
+    */
+  case class Machine(name : String, ipAddress : String)
+    extends intf.Machine
+
+  case class BackupDestinationDir(name: String, kind: BackupDestVal, dir: intf.BackupRemoteDestDir)
+    extends intf.BackupDestinationDir
+
+  /**
+    * Backup definition
+    */
+  case class BackupDef(srcMachine: intf.Machine,
+                       srcDirs: Seq[intf.BackupSrcDir],
+                       name: String,
+                       destinations: Seq[intf.BackupDestination])
+    extends intf.BackupDef {
+
+    /**
+      * Full paths to be backed-up
+      */
+    def srcPaths : Seq[Path] = srcDirs map (dir => machineRelative(BackupRoots.backupSourceMountDirs) / dir.path)
+
+    /**
+      * Full path to the (local) "backup directory"
+      */
+    def backupDirPath : Path  = machineRelative(BackupRoots.backupDirs) / name
+
+    /**
+      *
+      */
+    def machineRelative (relativeToPath: Path): Path = relativeToPath / srcMachine.name
+  }
 }

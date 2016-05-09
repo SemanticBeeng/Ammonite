@@ -14,7 +14,7 @@ package object intf {
     */
   sealed trait BackupDir {
 
-    def dir: RelPath
+    def path: RelPath
   }
 
   sealed trait Local
@@ -60,13 +60,24 @@ package object intf {
   trait BackupRemoteDestDir extends BackupDir with Remote with Dest
 
   // -----------------------------------------------------------
+  trait Machine {
+
+    def name : String
+
+    def ipAddress : String
+
+  }
+
   trait BackupDef {
 
-    def sources: Seq[BackupSrcDir]
+    def srcMachine : Machine
 
-    def dir: BackupLocalDir
+    def srcDirs: Seq[BackupSrcDir]
 
-    def dests: Seq[BackupRemoteDir]
+    def name: String
+
+    //def destinations: Seq[(BackupDestination, BackupRemoteDir)]
+    def destinations: Seq[BackupDestination]
   }
 
   // -----------------------------------------------------------
