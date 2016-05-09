@@ -1,7 +1,7 @@
-package hashbackup
+package ammonite.hashbackup
 
 import ammonite.ops.Path
-import hashbackup.intf.BackDestType.{BackupDestVal, BackBlaze_B2}
+import ammonite.hashbackup.intf.BackDestType.{BackupDestVal, BackBlaze_B2}
 
 /**
   *

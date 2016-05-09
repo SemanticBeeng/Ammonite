@@ -1,4 +1,4 @@
-package hashbackup
+package ammonite.hashbackup
 
 import ammonite.ops._
 import utest._

@@ -1,6 +1,6 @@
-package hashbackup
+package ammonite.hashbackup
 
-import hashbackup.impl.Machine
+import ammonite.hashbackup.impl.Machine
 
 /**
   *

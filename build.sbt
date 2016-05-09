@@ -150,7 +150,6 @@ lazy val repl = project
  */
 lazy val shell = project
   .dependsOn(ops, repl % "compile->compile;test->test")
-  .dependsOn(hashbackup)
   .settings(
     sharedSettings,
     name := "ammonite-shell",
@@ -199,13 +198,13 @@ lazy val sshd = project
   )
 
 lazy val hashbackup = project
-    .dependsOn(ops)
+    .dependsOn(ops % "compile->compile;test->test")
     .settings(
       sharedSettings,
       crossVersion := CrossVersion.full,
       name := "ammonite-hashbackup",
       libraryDependencies ++= Seq(
-	"net.jcazevedo" %% "moultingyaml" % "0.2"
+	      "net.jcazevedo" %% "moultingyaml" % "0.2"
       )
   )
 

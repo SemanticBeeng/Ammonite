@@ -1,9 +1,9 @@
-package hashbackup
+package ammonite.hashbackup
 
 import ammonite.ops._
-import hashbackup.MachinesAndStorageBoxes._
-import hashbackup.impl._
-import hashbackup.intf.BackDestType
+import ammonite.hashbackup.MachinesAndStorageBoxes._
+import ammonite.hashbackup.impl._
+import ammonite.hashbackup.intf.BackDestType
 
 /**
   *

@@ -1,8 +1,8 @@
-package hashbackup
+package ammonite.hashbackup
 
 import ammonite.ops.{Path, RelPath}
-import hashbackup.intf.BackDestType.BackupDestVal
-import hashbackup.intf.BackupDestination
+import ammonite.hashbackup.intf.BackDestType.BackupDestVal
+import ammonite.hashbackup.intf.BackupDestination
 
 /**
   *
