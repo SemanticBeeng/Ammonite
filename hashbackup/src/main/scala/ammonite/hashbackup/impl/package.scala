@@ -30,11 +30,19 @@ package object impl {
   /**
     *
     */
-  case class Machine(name : String, ipAddress : String)
+  case class Machine(name : String, address : String)
     extends intf.Machine
 
-  case class BackupDestinationDir(name: String, kind: BackupDestVal, dir: intf.BackupRemoteDestDir)
-    extends intf.BackupDestinationDir
+  case class BackupDestinationDir(machine: Machine, kind: BackupDestVal, dir: intf.BackupRemoteDestDir)
+    extends intf.BackupDestinationDir {
+
+    def path : Path  = machineRelative(BackupRoots.backupDirs) / machine.name
+
+    /**
+      *
+      */
+    def machineRelative (relativeToPath: Path): Path = relativeToPath / machine.name
+  }
 
   /**
     * Backup definition

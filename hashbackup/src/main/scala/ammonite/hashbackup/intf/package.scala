@@ -1,5 +1,6 @@
 package hashbackup
 
+import ammonite.ops.Path
 import hashbackup.intf.BackDestType.{BackupDestVal, BackBlaze_B2}
 
 /**
@@ -64,7 +65,7 @@ package object intf {
 
     def name : String
 
-    def ipAddress : String
+    def address : String
 
   }
 
@@ -87,7 +88,7 @@ package object intf {
     */
   trait BackupDestination {
 
-    def name: String
+    def machine: Machine
 
     def kind: BackupDestVal
   }
@@ -107,6 +108,8 @@ package object intf {
   trait BackupDestinationDir extends BackupDestination {
 
     def dir: BackupRemoteDestDir
+
+    def path: Path
   }
 
   trait BackupDestinationB2 extends BackupDestinationDir {

@@ -10,8 +10,8 @@ import hashbackup.intf.BackDestType
   */
 object Backups {
 
-  val dest_semanticbrainex_nas1 = BackupDestinationDir(
-    name = semanticbrainex_nas1.name,
+  val semanticbrainex_nas1_destBackup = BackupDestinationDir(
+    machine = semanticbrainex_nas1,
     kind = BackDestType.Directory,
     dir = BackupRemoteDestDir("Backup"))
 
@@ -19,7 +19,7 @@ object Backups {
     srcMachine = bigdatafierce,
     srcDirs = Seq(BackupSrcDir('mydocs/'backups)),
     name = "manual_backups",
-    destinations= Seq(dest_semanticbrainex_nas1))
+    destinations= Seq(semanticbrainex_nas1_destBackup))
 
 
 }
