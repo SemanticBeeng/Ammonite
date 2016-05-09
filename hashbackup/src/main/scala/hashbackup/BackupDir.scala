@@ -10,8 +10,16 @@ sealed trait BackupDir {
   def dir : RelPath
 }
 
-trait BackupSrcDir extends BackupDir
+sealed trait Local
+sealed trait Remote
+sealed trait Src
+sealed trait Dest
 
-trait BackupDestDir extends BackupDir
 
-trait BackupRemoteDir extends BackupDir
+trait BackupSrcDir extends BackupDir with Src
+
+trait BackupDestDir extends BackupDir with Dest
+
+trait BackupRemoteDir extends BackupDir with Remote
+
+trait BackupRemoteSrcDir extends BackupDir with Src with Remote
