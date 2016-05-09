@@ -7,4 +7,6 @@ target/
 .cache
 .sbtserver
 project/.sbtserver
+project/.boot
+project/.ivy
 tags

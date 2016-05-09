@@ -150,6 +150,7 @@ lazy val repl = project
  */
 lazy val shell = project
   .dependsOn(ops, repl % "compile->compile;test->test")
+  .dependsOn(hashbackup)
   .settings(
     sharedSettings,
     name := "ammonite-shell",
@@ -196,6 +197,18 @@ lazy val sshd = project
         "org.scalacheck" %% "scalacheck" % "1.12.4" % "test"
       )
   )
+
+lazy val hashbackup = project
+    .dependsOn(ops)
+    .settings(
+      sharedSettings,
+      crossVersion := CrossVersion.full,
+      name := "ammonite-hashbackup",
+      libraryDependencies ++= Seq(
+	"net.jcazevedo" %% "moultingyaml" % "0.2"
+      )
+  )
+
 
 lazy val readme = ScalatexReadme(
   projectId = "readme",
