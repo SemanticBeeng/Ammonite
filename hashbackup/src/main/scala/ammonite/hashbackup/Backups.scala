@@ -37,7 +37,10 @@ object MakeBackups extends App {
     println(s"Backup mount ${backup.mountPath}" )
 
     val nickdsc = new User("nickdsc", 1001, 1002)
-    backup.mountDirsAs(nickdsc)
+
+    import ammonite.hashbackup.OSHandler._
+
+    backup.pathsToMount map {p => mountDirAs(p, nickdsc, SSHFS)}
 
   }
 

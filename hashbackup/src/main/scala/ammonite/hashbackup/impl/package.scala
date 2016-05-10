@@ -1,11 +1,9 @@
 package ammonite.hashbackup
 
-import ammonite.hashbackup.impl.Util._
-import ammonite.hashbackup.intf
 import ammonite.hashbackup.intf.MountType.MountTypeVal
 import ammonite.ops.{Path, RelPath}
 import ammonite.hashbackup.intf.BackDestType.BackupDestVal
-import ammonite.hashbackup.intf.{MountStatus, User, BackupDestination}
+import ammonite.hashbackup.intf.MountStatus
 
 /**
   *
@@ -43,9 +41,7 @@ package object impl {
   case class BackupSource(machine: Machine, dirs: Seq[intf.BackupSrcDir], mountType: MountTypeVal)
     extends intf.BackupSource {
 
-    def paths : Seq[Path] = dirs map (dir => machinePath(BackupRoots.backupSourceMountDirs, machine) / dir.path)
-
-    override def mountDirsAs(user: intf.User): List[(Path, MountStatus)] = ???
+    def pathsToMount : Seq[Path] = dirs map (dir => machinePath(BackupRoots.backupSourceMountDirs, machine) / dir.path)
   }
 
   /**
@@ -56,7 +52,7 @@ package object impl {
 
     def path : Path  = machinePath(BackupRoots.backupDirs, machine) / dir.path
 
-    override def mountDirsAs(user: intf.User): List[(Path, MountStatus)] = ???
+    override def pathsToMount: Seq[Path] = List(path).toSeq
   }
 
   /**
@@ -70,34 +66,20 @@ package object impl {
     /**
       * Full paths to be backed-up
       */
-    def srcPaths : Seq[Path] = source.paths
+    def srcPaths : Seq[Path] = source.pathsToMount
 
     /**
       * Full path to the (local) "backup directory"
       */
     def localPath : Path  = machinePath(BackupRoots.backupDirs, source.machine) / name
 
-    def mountPath : Path = machinePath(BackupRoots.backupMountDirs, source.machine) / name
+    def mountPath() : Path = machinePath(BackupRoots.backupMountDirs, source.machine) / name
 
-    def mountDirsAs(user: intf.User) : List[(Path, MountStatus)] = {
-      source.mountDirsAs(user) //+
-//      destinations map {d => d.isInstanceOf[BackupDestinationDir] ? d.asInstanceOf[BackupDestinationDir].mountDirsAs
-//        : }
-//
-//
-//      ? dest.asInstanceOf[BackupDestinationDir]
-//        .mountDirsAs : false }
-    }
-
+    override def pathsToMount : Seq[Path] = srcPaths//(List(srcPaths()) ::: List(mountPath())).toSeq
   }
 
   case class User(name : String, UID :Int, GID : Int) extends intf.User
 
-  object Util {
+  val machinePath = (root: Path, machine: intf.Machine) => root / machine.name
 
-    /**
-      *
-      */
-    def machinePath(root: Path, machine: intf.Machine): Path = root / machine.name
-  }
 }

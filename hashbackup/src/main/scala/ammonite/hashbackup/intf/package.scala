@@ -120,7 +120,7 @@ package object intf {
 
   trait Mountable {
 
-    def mountDirsAs(user : User) : List[(Path, MountStatus)]
+    def pathsToMount : Seq[Path]
   }
 
   trait BackupSource extends Mountable {
@@ -131,7 +131,7 @@ package object intf {
 
     def mountType: MountTypeVal
 
-    def paths : Seq[Path]
+    def pathsToMount : Seq[Path]
   }
 
   /**
