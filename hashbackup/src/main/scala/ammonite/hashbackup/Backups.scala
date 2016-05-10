@@ -1,9 +1,9 @@
 package ammonite.hashbackup
 
 import ammonite.ops._
-import ammonite.hashbackup.MachinesAndStorageBoxes._
-import ammonite.hashbackup.impl._
 import ammonite.hashbackup.intf.BackDestType
+import ammonite.hashbackup.impl.{BackupSrcDir, BackupDef, BackupRemoteDestDir, BackupDestinationDir}
+import ammonite.hashbackup.MachinesAndStorageBoxes._
 
 /**
   *
@@ -17,9 +17,8 @@ object Backups {
 
   val b1 = new BackupDef(
     srcMachine = bigdatafierce,
-    srcDirs = Seq(BackupSrcDir('mydocs/'backups)),
+    srcDirs = Seq(BackupSrcDir('mydocs/"~backups")),
     name = "manual_backups",
     destinations= Seq(semanticbrainex_nas1_destBackup))
-
 
 }

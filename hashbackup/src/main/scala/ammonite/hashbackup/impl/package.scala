@@ -1,5 +1,6 @@
 package ammonite.hashbackup
 
+import ammonite.hashbackup.impl.Util._
 import ammonite.ops.{Path, RelPath}
 import ammonite.hashbackup.intf.BackDestType.BackupDestVal
 import ammonite.hashbackup.intf.BackupDestination
@@ -33,15 +34,13 @@ package object impl {
   case class Machine(name : String, address : String)
     extends intf.Machine
 
+  /**
+    *
+    */
   case class BackupDestinationDir(machine: Machine, kind: BackupDestVal, dir: intf.BackupRemoteDestDir)
     extends intf.BackupDestinationDir {
 
-    def path : Path  = machineRelative(BackupRoots.backupDirs) / machine.name
-
-    /**
-      *
-      */
-    def machineRelative (relativeToPath: Path): Path = relativeToPath / machine.name
+    def path : Path  = machinePath(BackupRoots.backupDirs, machine) / dir.path
   }
 
   /**
@@ -56,16 +55,21 @@ package object impl {
     /**
       * Full paths to be backed-up
       */
-    def srcPaths : Seq[Path] = srcDirs map (dir => machineRelative(BackupRoots.backupSourceMountDirs) / dir.path)
+    def srcPaths : Seq[Path] = srcDirs map (dir => machinePath(BackupRoots.backupSourceMountDirs, srcMachine) /
+      dir.path)
 
     /**
       * Full path to the (local) "backup directory"
       */
-    def backupDirPath : Path  = machineRelative(BackupRoots.backupDirs) / name
+    def backupDirPath : Path  = machinePath(BackupRoots.backupDirs, srcMachine) / name
+
+  }
+
+  object Util {
 
     /**
       *
       */
-    def machineRelative (relativeToPath: Path): Path = relativeToPath / srcMachine.name
+    def machinePath(root: Path, machine: intf.Machine): Path = root / machine.name
   }
 }

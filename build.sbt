@@ -208,7 +208,6 @@ lazy val hashbackup = project
       )
   )
 
-
 lazy val readme = ScalatexReadme(
   projectId = "readme",
   wd = file(""),
@@ -249,5 +248,5 @@ lazy val tested = project
 
 lazy val published = project
   .in(file("target/published"))
-  .aggregate(ops, shell, terminal, repl, sshd)
+  .aggregate(ops, shell, terminal, repl, sshd, hashbackup)
   .settings(dontPublishSettings)

@@ -5,7 +5,7 @@ import utest._
 /**
   *
   */
-class BackupSetupTests  extends TestSuite{
+class BackupSetupTests  extends TestSuite {
 
 
     val tests = TestSuite {
