@@ -88,19 +88,42 @@ package object intf {
     * A backup definition.
     * Note: a backup can only be done from a single machine
     */
-  trait BackupDef {
+  trait BackupDef extends Mountable {
 
     def name: String
 
     def source: BackupSource
 
-    //def destinations: Seq[(BackupDestination, BackupRemoteDir)]
     def destinations: Seq[BackupDestination]
+
+    def srcPaths : Seq[Path]
+
+    def localPath : Path
+
+    def mountPath : Path
   }
 
   // -----------------------------------------------------------
+  trait User {
+    def name: String
 
-  trait BackupSource {
+    def UID : Int
+
+    def GID : Int
+  }
+
+  trait MountStatus {
+    def result : Int
+
+    def message : String
+  }
+
+  trait Mountable {
+
+    def mountDirsAs(user : User) : List[(Path, MountStatus)]
+  }
+
+  trait BackupSource extends Mountable {
 
     def machine: Machine
 
@@ -138,7 +161,7 @@ package object intf {
   /**
     *
     */
-  trait BackupDestinationDir extends BackupDestination {
+  trait BackupDestinationDir extends BackupDestination with Mountable {
 
     def dir: BackupRemoteDestDir
 

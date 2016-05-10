@@ -1,10 +1,11 @@
 package ammonite.hashbackup
 
 import ammonite.hashbackup.impl.Util._
+import ammonite.hashbackup.intf
 import ammonite.hashbackup.intf.MountType.MountTypeVal
 import ammonite.ops.{Path, RelPath}
 import ammonite.hashbackup.intf.BackDestType.BackupDestVal
-import ammonite.hashbackup.intf.BackupDestination
+import ammonite.hashbackup.intf.{MountStatus, User, BackupDestination}
 
 /**
   *
@@ -44,6 +45,7 @@ package object impl {
 
     def paths : Seq[Path] = dirs map (dir => machinePath(BackupRoots.backupSourceMountDirs, machine) / dir.path)
 
+    override def mountDirsAs(user: intf.User): List[(Path, MountStatus)] = ???
   }
 
   /**
@@ -53,6 +55,8 @@ package object impl {
     extends intf.BackupDestinationDir {
 
     def path : Path  = machinePath(BackupRoots.backupDirs, machine) / dir.path
+
+    override def mountDirsAs(user: intf.User): List[(Path, MountStatus)] = ???
   }
 
   /**
@@ -71,13 +75,23 @@ package object impl {
     /**
       * Full path to the (local) "backup directory"
       */
-    def backupDirPath : Path  = machinePath(BackupRoots.backupDirs, source.machine) / name
+    def localPath : Path  = machinePath(BackupRoots.backupDirs, source.machine) / name
 
-    def mountSourceDirs: Unit = {
+    def mountPath : Path = machinePath(BackupRoots.backupMountDirs, source.machine) / name
 
+    def mountDirsAs(user: intf.User) : List[(Path, MountStatus)] = {
+      source.mountDirsAs(user) //+
+//      destinations map {d => d.isInstanceOf[BackupDestinationDir] ? d.asInstanceOf[BackupDestinationDir].mountDirsAs
+//        : }
+//
+//
+//      ? dest.asInstanceOf[BackupDestinationDir]
+//        .mountDirsAs : false }
     }
 
   }
+
+  case class User(name : String, UID :Int, GID : Int) extends intf.User
 
   object Util {
 
