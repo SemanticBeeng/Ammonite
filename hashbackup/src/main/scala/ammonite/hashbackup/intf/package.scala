@@ -1,5 +1,6 @@
 package ammonite.hashbackup
 
+import ammonite.hashbackup.intf.MountType.MountTypeVal
 import ammonite.ops.Path
 import ammonite.hashbackup.intf.BackDestType.{BackupDestVal, BackBlaze_B2}
 
@@ -69,19 +70,46 @@ package object intf {
 
   }
 
+  /**
+    * Type of file system used to mount [[BackupRemoteSrcDir]]s from a [[Machine]] in a [[BackupDef]]
+    */
+  object MountType {
+
+    sealed trait MountTypeVal
+
+    case object CIFS extends MountTypeVal
+
+    case object SSHFS extends MountTypeVal
+
+    val values = Seq(CIFS, SSHFS)
+  }
+
+  /**
+    * A backup definition.
+    * Note: a backup can only be done from a single machine
+    */
   trait BackupDef {
 
-    def srcMachine : Machine
-
-    def srcDirs: Seq[BackupSrcDir]
-
     def name: String
+
+    def source: BackupSource
 
     //def destinations: Seq[(BackupDestination, BackupRemoteDir)]
     def destinations: Seq[BackupDestination]
   }
 
   // -----------------------------------------------------------
+
+  trait BackupSource {
+
+    def machine: Machine
+
+    def dirs: Seq[BackupSrcDir]
+
+    def mountType: MountTypeVal
+
+    def paths : Seq[Path]
+  }
 
   /**
     * A "backup destination"
@@ -93,6 +121,9 @@ package object intf {
     def kind: BackupDestVal
   }
 
+  /**
+    *
+    */
   object BackDestType {
 
     sealed trait BackupDestVal
@@ -104,10 +135,14 @@ package object intf {
     val values = Seq(Directory, BackBlaze_B2)
   }
 
-
+  /**
+    *
+    */
   trait BackupDestinationDir extends BackupDestination {
 
     def dir: BackupRemoteDestDir
+
+    def mountType : MountTypeVal
 
     def path: Path
   }
