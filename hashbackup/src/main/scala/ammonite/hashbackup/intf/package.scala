@@ -90,19 +90,13 @@ package object intf {
     * A backup definition.
     * Note: a backup can only be done from a single machine
     */
-  trait BackupDef /*extends Mountable*/ {
+  trait BackupDef {
 
     def name: String
 
     def source: BackupSource
 
     def destinations: Seq[BackupDestination]
-
-//    def srcPaths : Seq[Path]
-//
-//    def localPath : Path
-//
-//    def mountPath : Path
   }
 
   // -----------------------------------------------------------
@@ -131,8 +125,6 @@ package object intf {
     def shareName : String
 
     def localMountPath : Path
-
-    //def pathsToMount : Seq[Path]
   }
 
   /**

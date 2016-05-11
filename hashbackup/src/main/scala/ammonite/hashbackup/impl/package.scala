@@ -53,16 +53,6 @@ package object impl {
     }
 
     def localMountPath = impl.machinePath(BackupRoots.backupMountDirs, machine) / shareDir.path
-
-
-//    def pathsToMount : Seq[Path] = {
-//
-//      if (mountType == LOCAL)
-//        Seq.empty[Path]
-//      else
-//        Seq(machinePath(BackupRoots.backupSourceMountDirs, machine) / shareDir.path)
-//        //dirs map (dir => machinePath(BackupRoots.backupSourceMountDirs, machine) / dir.path)
-//    }
   }
 
   /**
@@ -73,7 +63,6 @@ package object impl {
 
     def path : Path  = machinePath(BackupRoots.backupDirs, machine) / dir.path
 
-//    override def pathsToMount: Seq[Path] = List(path).toSeq
     override def shareDir: BackupDir = dir
 
     override def shareName: String = shareDir.path.toString
@@ -88,11 +77,6 @@ package object impl {
                        source: intf.BackupSource,
                        destinations: Seq[intf.BackupDestination])
     extends intf.BackupDef {
-
-    /**
-      * Full paths to be backed-up
-      */
-    //def srcPaths : Seq[Path] = source.pathsToMount
 
     /**
       * Full path to the (local) "backup directory"
@@ -113,15 +97,8 @@ package object impl {
       */
     def mountRemoteDestPaths(user: User): Seq[\/[Path, intf.MountError]] = {
 
-      //val a = Seq.empty[intf.BackupDestination]
-
-//      for(d <- destinations if d.isInstanceOf[BackupDestinationDir])
-//        yield /*d.asInstanceOf[BackupDestinationDir]*/
-//          /*map {p => */mountDirAs(d, user)/*}*/
-
       destinations map {d => mountDirAs(d, user)}
     }
-
   }
 
   case class MountError(result : Int, message : String) extends intf.MountError {
@@ -131,5 +108,4 @@ package object impl {
   case class User(name : String, UID :Int, GID : Int) extends intf.User
 
   val machinePath = (root: Path, machine: intf.Machine) => root / machine.name
-
 }
