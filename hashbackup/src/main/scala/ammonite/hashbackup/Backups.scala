@@ -20,7 +20,8 @@ object Backups {
   val manualBackups = new BackupDef(
     name = "manual_backups",
     source = new BackupSource(machine = bigdatafierce,
-      dirs = Seq(BackupSrcDir('mydocs/"~backups")),
+      shareDir = BackupSrcDir('mydocs),
+      dirs = Seq(BackupSrcDir("~backups")),
       mountType = CIFS),
     destinations= Seq(semanticbrainex_nas1_destBackup))
 
@@ -33,15 +34,14 @@ object MakeBackups extends App {
     val backup = Backups.manualBackups
 
     println(s"Backup local ${backup.localPath}" )
-    println(s"Backup source paths ${backup.srcPaths}")
+    println(s"Backup source paths ${backup.source.dirs}")
     println(s"Backup mount ${backup.mountPath}" )
 
     val nickdsc = new User("nickdsc", 1001, 1002)
 
-    import ammonite.hashbackup.OSHandler._
+    backup.mountSourcePaths(nickdsc)
 
-    //backup.pathsToMount map {p => mountDirAs(p, nickdsc, SSHFS)}
-
+    backup.mountRemoteDestPaths(nickdsc)
   }
 
 }

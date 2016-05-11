@@ -1,8 +1,8 @@
 package ammonite.hashbackup
 
-import ammonite.hashbackup.intf.MountType.MountTypeVal
 import ammonite.ops.Path
-import ammonite.hashbackup.intf.BackDestType.{BackupDestVal, BackBlaze_B2}
+import ammonite.hashbackup.intf.MountType.MountTypeVal
+import ammonite.hashbackup.intf.BackDestType.BackupDestVal
 
 /**
   *
@@ -98,11 +98,11 @@ package object intf {
 
     def destinations: Seq[BackupDestination]
 
-    def srcPaths : Seq[Path]
-
-    def localPath : Path
-
-    def mountPath : Path
+//    def srcPaths : Seq[Path]
+//
+//    def localPath : Path
+//
+//    def mountPath : Path
   }
 
   // -----------------------------------------------------------
@@ -122,7 +122,17 @@ package object intf {
 
   trait Mountable {
 
-    def pathsToMount : Seq[Path]
+    def machine: Machine
+
+    def shareDir : BackupDir
+
+    def mountType: MountTypeVal
+
+    def shareName : String
+
+    def localMountPath : Path
+
+    //def pathsToMount : Seq[Path]
   }
 
   /**
@@ -133,20 +143,28 @@ package object intf {
     def machine: Machine
 
     /**
-      * A map between the root backup folder name and the folder names of children to be backed-up
-      * @example Map("mydocs", List("~backups", "Evernote", "Keys", "OneDrive", "Personal", "repos/knowledgerepo))
+      * The "share" to backup from.
+      * <ul>
+      *   <li> a real share if [[machine]] != backup machine ; type = [[BackupRemoteSrcDir]]
+      *   <li> a local directory if [[machine]] == backup machine ; type = [[BackupLocalSrcDir]]
+      * </ul>
       */
-    def dirs: Map[BackupSrcDir, Seq[BackupSrcDir]]
+    def shareDir : BackupSrcDir
+
+    /**
+      * The children of [[shareDir]] that are backed-up
+      */
+    def dirs: Seq[BackupSrcDir]
 
     def mountType: MountTypeVal
 
-    def pathsToMount : Seq[Path]
+    //def pathsToMount : Seq[Path]
   }
 
   /**
     * A "backup destination"
     */
-  trait BackupDestination {
+  trait BackupDestination extends Mountable {
 
     def machine: Machine
 
@@ -170,7 +188,7 @@ package object intf {
   /**
     *
     */
-  trait BackupDestinationDir extends BackupDestination with Mountable {
+  trait BackupDestinationDir extends BackupDestination {
 
     def dir: BackupRemoteDestDir
 

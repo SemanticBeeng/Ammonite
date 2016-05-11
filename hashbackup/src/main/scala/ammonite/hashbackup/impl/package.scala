@@ -1,9 +1,11 @@
 package ammonite.hashbackup
 
-import ammonite.hashbackup.intf.MountType.{LOCAL, MountTypeVal}
+import ammonite.hashbackup.intf.MountType._
 import ammonite.ops.{Path, RelPath}
 import ammonite.hashbackup.intf.BackDestType.BackupDestVal
-import ammonite.hashbackup.intf.MountError
+import ammonite.hashbackup.intf.BackupDir
+
+import scala.Predef._
 
 /**
   *
@@ -38,16 +40,28 @@ package object impl {
   /**
     *
     */
-  case class BackupSource(machine: Machine, dirs: Seq[intf.BackupSrcDir], mountType: MountTypeVal)
+  case class BackupSource(machine: Machine, shareDir: intf.BackupSrcDir, dirs: Seq[intf.BackupSrcDir],
+                          mountType: MountTypeVal)
     extends intf.BackupSource {
 
-    def pathsToMount : Seq[Path] = {
+    def shareName: String = {
 
-      if (mountType == LOCAL)
-        Seq.empty[Path]
-      else
-        dirs map (dir => machinePath(BackupRoots.backupSourceMountDirs, machine) / dir.path)
+//      if(shareDir.isInstanceOf[BackupLocalDir])
+//      assert(shareDir.path.segments.length == 1)
+      shareDir.path.toString
     }
+
+    def localMountPath = impl.machinePath(BackupRoots.backupMountDirs, machine) / shareDir.path
+
+
+//    def pathsToMount : Seq[Path] = {
+//
+//      if (mountType == LOCAL)
+//        Seq.empty[Path]
+//      else
+//        Seq(machinePath(BackupRoots.backupSourceMountDirs, machine) / shareDir.path)
+//        //dirs map (dir => machinePath(BackupRoots.backupSourceMountDirs, machine) / dir.path)
+//    }
   }
 
   /**
@@ -58,7 +72,12 @@ package object impl {
 
     def path : Path  = machinePath(BackupRoots.backupDirs, machine) / dir.path
 
-    override def pathsToMount: Seq[Path] = List(path).toSeq
+//    override def pathsToMount: Seq[Path] = List(path).toSeq
+    override def shareDir: BackupDir = dir
+
+    override def shareName: String = shareDir.path.toString
+
+    override def localMountPath: Path = impl.machinePath(BackupRoots.backupMountDirs, machine) / shareDir.path
   }
 
   /**
@@ -72,7 +91,7 @@ package object impl {
     /**
       * Full paths to be backed-up
       */
-    def srcPaths : Seq[Path] = source.pathsToMount
+    //def srcPaths : Seq[Path] = source.pathsToMount
 
     /**
       * Full path to the (local) "backup directory"
@@ -84,19 +103,22 @@ package object impl {
     import ammonite.hashbackup.OSHandler._
 
     def mountSourcePaths(user: User) = {
-      source.pathsToMount map {p => mountDirAs(p, user, source.mountType)}
+
+      /*source.pathsToMount map {p =>*/ mountDirAs(source, user)/*}*/
     }
 
     /**
       *
       */
-    def mountRemoteDestPaths(user: User): Seq[Either[Path, MountError]] = {
+    def mountRemoteDestPaths(user: User): Seq[Either[Path, intf.MountError]] = {
 
-      val a = Seq.empty[intf.BackupDestination]
+      //val a = Seq.empty[intf.BackupDestination]
 
-      (for(d <- destinations if d.isInstanceOf[BackupDestinationDir])
-        yield d.asInstanceOf[BackupDestinationDir].pathsToMount
-          map {p => mountDirAs(d.machine, p, user, source.mountType)}).flatten
+//      for(d <- destinations if d.isInstanceOf[BackupDestinationDir])
+//        yield /*d.asInstanceOf[BackupDestinationDir]*/
+//          /*map {p => */mountDirAs(d, user)/*}*/
+
+      destinations map {d => mountDirAs(d, user)}
     }
 
   }
