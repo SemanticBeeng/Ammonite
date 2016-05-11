@@ -77,6 +77,8 @@ package object intf {
 
     sealed trait MountTypeVal
 
+    case object LOCAL extends MountTypeVal
+
     case object CIFS extends MountTypeVal
 
     case object SSHFS extends MountTypeVal
@@ -88,7 +90,7 @@ package object intf {
     * A backup definition.
     * Note: a backup can only be done from a single machine
     */
-  trait BackupDef extends Mountable {
+  trait BackupDef /*extends Mountable*/ {
 
     def name: String
 
@@ -112,7 +114,7 @@ package object intf {
     def GID : Int
   }
 
-  trait MountStatus {
+  trait MountError {
     def result : Int
 
     def message : String
@@ -123,11 +125,18 @@ package object intf {
     def pathsToMount : Seq[Path]
   }
 
+  /**
+    * Cannot mix remote and local [[BackupSrcDir]] in the same [[BackupSource]]
+    */
   trait BackupSource extends Mountable {
 
     def machine: Machine
 
-    def dirs: Seq[BackupSrcDir]
+    /**
+      * A map between the root backup folder name and the folder names of children to be backed-up
+      * @example Map("mydocs", List("~backups", "Evernote", "Keys", "OneDrive", "Personal", "repos/knowledgerepo))
+      */
+    def dirs: Map[BackupSrcDir, Seq[BackupSrcDir]]
 
     def mountType: MountTypeVal
 

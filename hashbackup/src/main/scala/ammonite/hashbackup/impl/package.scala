@@ -1,9 +1,9 @@
 package ammonite.hashbackup
 
-import ammonite.hashbackup.intf.MountType.MountTypeVal
+import ammonite.hashbackup.intf.MountType.{LOCAL, MountTypeVal}
 import ammonite.ops.{Path, RelPath}
 import ammonite.hashbackup.intf.BackDestType.BackupDestVal
-import ammonite.hashbackup.intf.MountStatus
+import ammonite.hashbackup.intf.MountError
 
 /**
   *
@@ -41,7 +41,13 @@ package object impl {
   case class BackupSource(machine: Machine, dirs: Seq[intf.BackupSrcDir], mountType: MountTypeVal)
     extends intf.BackupSource {
 
-    def pathsToMount : Seq[Path] = dirs map (dir => machinePath(BackupRoots.backupSourceMountDirs, machine) / dir.path)
+    def pathsToMount : Seq[Path] = {
+
+      if (mountType == LOCAL)
+        Seq.empty[Path]
+      else
+        dirs map (dir => machinePath(BackupRoots.backupSourceMountDirs, machine) / dir.path)
+    }
   }
 
   /**
@@ -73,9 +79,30 @@ package object impl {
       */
     def localPath : Path  = machinePath(BackupRoots.backupDirs, source.machine) / name
 
-    def mountPath() : Path = machinePath(BackupRoots.backupMountDirs, source.machine) / name
+    def mountPath : Path = machinePath(BackupRoots.backupMountDirs, source.machine) / name
 
-    override def pathsToMount : Seq[Path] = srcPaths//(List(srcPaths()) ::: List(mountPath())).toSeq
+    import ammonite.hashbackup.OSHandler._
+
+    def mountSourcePaths(user: User) = {
+      source.pathsToMount map {p => mountDirAs(p, user, source.mountType)}
+    }
+
+    /**
+      *
+      */
+    def mountRemoteDestPaths(user: User): Seq[Either[Path, MountError]] = {
+
+      val a = Seq.empty[intf.BackupDestination]
+
+      (for(d <- destinations if d.isInstanceOf[BackupDestinationDir])
+        yield d.asInstanceOf[BackupDestinationDir].pathsToMount
+          map {p => mountDirAs(d.machine, p, user, source.mountType)}).flatten
+    }
+
+  }
+
+  case class MountError(result : Int, message : String) extends intf.MountError {
+
   }
 
   case class User(name : String, UID :Int, GID : Int) extends intf.User

@@ -40,7 +40,7 @@ object MakeBackups extends App {
 
     import ammonite.hashbackup.OSHandler._
 
-    backup.pathsToMount map {p => mountDirAs(p, nickdsc, SSHFS)}
+    //backup.pathsToMount map {p => mountDirAs(p, nickdsc, SSHFS)}
 
   }
 
