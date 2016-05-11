@@ -1,7 +1,6 @@
 package ammonite.hashbackup
 
 import ammonite.hashbackup.intf.MountType.{SSHFS, CIFS}
-import ammonite.ops._
 import ammonite.hashbackup.intf.BackDestType
 import ammonite.hashbackup.impl._
 import ammonite.hashbackup.MachinesAndStorageBoxes._
@@ -31,7 +30,7 @@ object MakeBackups extends App {
 
   override def main(args: Array[String]) {
 
-    OSHandler.checkRootsExist
+    OSHandler.ensureRootsGoodToMountUnder
 
     val backup = Backups.manualBackups
 

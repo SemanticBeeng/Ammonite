@@ -1,6 +1,8 @@
 package ammonite.hashbackup
 
 import java.nio.file.FileSystemException
+import java.nio.file.attribute.PosixFilePermission._
+import java.nio.file.attribute.{PosixFilePermission, PosixFilePermissions}
 
 import ammonite.ops._
 import ammonite.ops.ImplicitWd._
@@ -17,16 +19,23 @@ import scalaz.\/
   */
 object OSHandler {
 
-  def checkRootsExist = {
+  /**
+    *
+    */
+  def ensureRootsGoodToMountUnder() = {
 
-    def check(d: Path): Path = {
-
-      val info: stat = stat! d
-      val isGood = info.isDir && info.permissions.size > 0
-      d
+    def isWritableDir(info: stat): Boolean = {
+      !info.isDir && info.permissions.exists(p => p == OWNER_WRITE || p == GROUP_WRITE || p == OTHERS_WRITE)
     }
 
-    val l: List[Try[Path]] = BackupRoots.all map (d => Try(check(d)).recoverWith({
+    def check(d: Path): Unit = {
+
+      val info: stat = stat! d
+      if (isWritableDir(info))
+        throw new FileSystemException(s"Folder ${d.toString} not suitable to use for mount")
+    }
+
+    val l = BackupRoots.all map (d => Try(check(d)).recoverWith({
       case e : FileSystemException => Failure (e)
     }))
 
@@ -52,7 +61,7 @@ object OSHandler {
         val shareName: String = mountable.shareName
         val localPath = mountable.localMountPath.toString
 
-        val cmd = s"sshfs -o uid=${user.UID},gid=${user.GID},reconnect " +
+        val cmd = s"sudo sshfs -o uid=${user.UID},gid=${user.GID},reconnect " +
                   s"${mountable.machine.address}:$shareName $localPath"
         println(s"Executing $cmd")
 
@@ -62,7 +71,7 @@ object OSHandler {
         val shareName: String = mountable.shareName
         val localPath = mountable.localMountPath.toString
 
-        val cmd = s"mount -t cifs -o user=${user.name} " +
+        val cmd = s"sudo mount -t cifs -o user=${user.name} " +
                   s"//${mountable.machine.address}/$shareName $localPath"
         println(s"Executing $cmd")
 
