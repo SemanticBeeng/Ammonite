@@ -6,6 +6,7 @@ import ammonite.hashbackup.intf.BackDestType.BackupDestVal
 import ammonite.hashbackup.intf.BackupDir
 
 import scala.Predef._
+import scalaz.\/
 
 /**
   *
@@ -110,7 +111,7 @@ package object impl {
     /**
       *
       */
-    def mountRemoteDestPaths(user: User): Seq[Either[Path, intf.MountError]] = {
+    def mountRemoteDestPaths(user: User): Seq[\/[Path, intf.MountError]] = {
 
       //val a = Seq.empty[intf.BackupDestination]
 

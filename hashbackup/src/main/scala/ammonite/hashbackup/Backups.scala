@@ -31,6 +31,8 @@ object MakeBackups extends App {
 
   override def main(args: Array[String]) {
 
+    OSHandler.checkRootsExist
+
     val backup = Backups.manualBackups
 
     println(s"Backup local ${backup.localPath}" )

@@ -1,5 +1,7 @@
 package ammonite.hashbackup
 
+import java.nio.file.FileSystemException
+
 import ammonite.ops._
 import ammonite.ops.ImplicitWd._
 import ammonite.hashbackup.impl.User
@@ -7,17 +9,44 @@ import ammonite.hashbackup.intf._
 import ammonite.hashbackup.intf.MountType._
 import ammonite.ops.Path
 
+import scala.util.{Failure, Try}
+import scalaz.\/
+
 /**
   *
   */
 object OSHandler {
 
-  def mountDirAs(/*machine: Machine, */ mountable: Mountable, user : User) : Either[Path, MountError] = {
+  def checkRootsExist = {
+
+    def check(d: Path): Path = {
+
+      val info: stat = stat! d
+      val isGood = info.isDir && info.permissions.size > 0
+      d
+    }
+
+    val l: List[Try[Path]] = BackupRoots.all map (d => Try(check(d)).recoverWith({
+      case e : FileSystemException => Failure (e)
+    }))
+
+    println(l)
+
+  }
+
+  def mountDirAs(/*machine: Machine, */ mountable: Mountable, user : User) : \/[Path, MountError] = {
+
+    def codeToVal(res: CommandResult): \/[Path, impl.MountError] = {
+      if (res.exitCode == 0)
+        \/.left(mountable.localMountPath)
+      else
+        \/.right(new impl.MountError(res.exitCode, res.out.string))
+    }
 
     mountable.mountType match  {
 
       case LOCAL =>
-          Left(root / mountable.shareDir.path)
+        \/.left(root / mountable.shareDir.path)
 
       case SSHFS =>
         val shareName: String = mountable.shareName
@@ -27,10 +56,7 @@ object OSHandler {
                   s"${mountable.machine.address}:$shareName $localPath"
         println(s"Executing $cmd")
 
-        val res = %%(cmd)
-        if (res.exitCode == 0) Left(mountable.localMountPath)
-        else Right(new impl.MountError(res.exitCode, res.out.string))
-
+        codeToVal(%%(cmd))
 
       case CIFS =>
         val shareName: String = mountable.shareName
@@ -40,15 +66,14 @@ object OSHandler {
                   s"//${mountable.machine.address}/$shareName $localPath"
         println(s"Executing $cmd")
 
-        val res = %%(cmd)
-        if (res.exitCode == 0) Left(mountable.localMountPath)
-        else Right(new impl.MountError(res.exitCode, res.out.string))
+        codeToVal(%%(cmd))
 
       case m =>
-        Right(new impl.MountError(-1, "Unknown mount type" + m))
-    }
+        \/.right(new impl.MountError(-1, "Unknown mount type" + m))
 
+    }
   }
+
 
   //val f: (Path, User, MountTypeVal) => Either[Path, MountError] = mountDirAs
 
