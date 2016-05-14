@@ -34,9 +34,7 @@ object MakeBackups extends App {
 
     val backup = Backups.manualBackups
 
-    println(s"Backup local ${backup.localPath}" )
-    println(s"Backup source paths ${backup.source.dirs}")
-    println(s"Backup mount ${backup.mountPath}" )
+    println(backup)
 
     val nickdsc = new User("nickdsc", 1001, 1002)
 

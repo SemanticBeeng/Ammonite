@@ -2,14 +2,11 @@ package ammonite.hashbackup
 
 import java.nio.file.FileSystemException
 import java.nio.file.attribute.PosixFilePermission._
-import java.nio.file.attribute.{PosixFilePermission, PosixFilePermissions}
 
 import ammonite.ops._
 import ammonite.ops.ImplicitWd._
-import ammonite.hashbackup.impl.User
 import ammonite.hashbackup.intf._
 import ammonite.hashbackup.intf.MountType._
-import ammonite.ops.Path
 
 import scala.util.{Failure, Try}
 import scalaz.\/

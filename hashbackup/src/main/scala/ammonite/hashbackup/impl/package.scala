@@ -53,6 +53,8 @@ package object impl {
     }
 
     def localMountPath = impl.machinePath(BackupRoots.backupMountDirs, machine) / shareDir.path
+
+    //override def toString = s"Share name = $shareName; Dirs = $dirs; Local mount = $localMountPath"
   }
 
   /**
@@ -99,6 +101,9 @@ package object impl {
 
       destinations map {d => mountDirAs(d, user)}
     }
+
+    //override def toString = s"Name = $name; Local path = $localPath; Source = {$source}; Mount at = $mountPath"
+
   }
 
   case class MountError(result : Int, message : String) extends intf.MountError {
