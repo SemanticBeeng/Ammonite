@@ -72,7 +72,7 @@ package object impl {
 
     override def shareDir: BackupDir = dir
 
-    override def shareName: String = shareDir.path.toString
+    override def shareName: String = shareDir.path.toString.replace('/', '_')
 
     override def localMountPath: Path = impl.machinePath(BackupRoots.backupMountDirs, machine) / shareDir.path
 
@@ -84,7 +84,7 @@ package object impl {
   /**
     * Backup definition
     */
-  case class BackupDef(name: String,
+  sealed case class BackupDef(name: String,
                        source: intf.BackupSource,
                        destinations: Seq[intf.BackupDestination])
     extends intf.BackupDef {

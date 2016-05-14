@@ -1,11 +1,10 @@
 package ammonite.hashbackup
 
+import ammonite.ops._
 import ammonite.hashbackup.intf.MountType.{LOCAL, SSHFS, CIFS}
 import ammonite.hashbackup.intf.BackDestType
 import ammonite.hashbackup.impl._
 import ammonite.hashbackup.MachinesAndStorageBoxes._
-import ammonite.ops._
-
 /**
   *
   */
@@ -34,17 +33,17 @@ object Backups {
     *
     */
   def defineBigdatafierceBackups: Seq[BackupDef] = {
-      val manual_backupsBackup = new BackupDef(
+      val manual_backupsBackup = BackupDef(
         name = "manual_backups",
-        source = new BackupSource(machine = bigdatafierce,
+        source = BackupSource(machine = bigdatafierce,
           shareDir = BackupSrcDir('mydocs),
           dirs = Seq(BackupSrcDir("~backups")),
           mountType = CIFS),
         destinations = naz1AndHz1)
 
-      val nickdsc_keysBackup = new BackupDef(
+      val nickdsc_keysBackup = BackupDef(
         name = nickdsc_keys,
-        source = new BackupSource(machine = bigdatafierce,
+        source = BackupSource(machine = bigdatafierce,
           shareDir = BackupSrcDir('mydocs),
           dirs = Seq(BackupSrcDir("Keys")),
           mountType = CIFS),
@@ -53,41 +52,41 @@ object Backups {
       /**
         * @todo: can I run the same backup with different sources??
         */
-      val nickdsc_keys2Backup = new BackupDef(
+      val nickdsc_keys2Backup = BackupDef(
         name = nickdsc_keys,
-        source = new BackupSource(machine = bigdatafierce,
+        source = BackupSource(machine = bigdatafierce,
           shareDir = BackupSrcDir('Users),
           dirs = Seq(BackupSrcDir(RelPath("nickdsc/.ssh"))),
           mountType = CIFS),
         destinations = naz1AndHz1)
 
-      val personal_and_corpBackup = new BackupDef(
+      val personal_and_corpBackup = BackupDef(
         name = "personal_and_corp",
-        source = new BackupSource(machine = bigdatafierce,
+        source = BackupSource(machine = bigdatafierce,
           shareDir = BackupSrcDir('mydocs),
           dirs = Seq(BackupSrcDir("Personal")),
           mountType = CIFS),
         destinations = naz1AndHz1)
 
-      val knowledgerepoBackup = new BackupDef(
+      val knowledgerepoBackup = BackupDef(
         name = "knowledgerepo",
-        source = new BackupSource(machine = bigdatafierce,
+        source = BackupSource(machine = bigdatafierce,
           shareDir = BackupSrcDir('mydocs),
           dirs = Seq(BackupSrcDir(RelPath("repos/knowledgerepo"))),
           mountType = CIFS),
         destinations = naz1AndHz1)
 
-      val project_sourcesBackup = new BackupDef(
+      val project_sourcesBackup = BackupDef(
         name = "project_sources",
-        source = new BackupSource(machine = bigdatafierce,
+        source = BackupSource(machine = bigdatafierce,
           shareDir = BackupSrcDir('projects),
           dirs = Seq(BackupSrcDir(RelPath("."))),
           mountType = CIFS),
         destinations = naz1AndHz1)
 
-      val nickdsc_user_homeBackup = new BackupDef(
+      val nickdsc_user_homeBackup = BackupDef(
         name = "nickdsc_user_home",
-        source = new BackupSource(machine = bigdatafierce,
+        source = BackupSource(machine = bigdatafierce,
           shareDir = BackupSrcDir('Users),
           dirs = Seq(BackupSrcDir(RelPath("nickdsc/.vagrant.d")),
             BackupSrcDir(RelPath("nickdsc/.x2go")),
@@ -101,9 +100,9 @@ object Backups {
           mountType = CIFS),
         destinations = naz1AndHz1)
 
-      val virtual_machinessBackup = new BackupDef(
+      val virtual_machinessBackup = BackupDef(
         name = "virtual_machines",
-        source = new BackupSource(machine = bigdatafierce,
+        source = BackupSource(machine = bigdatafierce,
           shareDir = BackupSrcDir('vms),
           dirs = Seq(BackupSrcDir(RelPath("VirtualBox VMs/DevShell-Ubuntu")),
             BackupSrcDir(RelPath("VirtualBox VMs/MacKnowledge")),
@@ -126,17 +125,17 @@ object Backups {
     */
   def defineBigdatafierce_vmBackups: Seq[BackupDef] = {
 
-      val pure_dataBackup = new BackupDef(
+      val pure_dataBackup = BackupDef(
         name = "pure_data",
-        source = new BackupSource(machine = bigdatafierce_vm,
+        source = BackupSource(machine = bigdatafierce_vm,
           shareDir = BackupSrcDir('datascience),
           dirs = Seq(BackupSrcDir('marketdata)),
           mountType = LOCAL),
         destinations = naz1AndHz1)
 
-      val nickdsc_user_homeBackup = new BackupDef(
+      val nickdsc_user_homeBackup = BackupDef(
         name = "nickdsc_user_home",
-        source = new BackupSource(machine = bigdatafierce_vm,
+        source = BackupSource(machine = bigdatafierce_vm,
           shareDir = BackupSrcDir(RelPath("home/nickdsc")),
           dirs = Seq(BackupSrcDir(RelPath(".bash")),
             BackupSrcDir(RelPath(".vim")),
@@ -145,9 +144,9 @@ object Backups {
           mountType = LOCAL),
         destinations = naz1AndHz1)
 
-      val nickdsc_keysBackup = new BackupDef(
+      val nickdsc_keysBackup = BackupDef(
         name = nickdsc_keys,
-        source = new BackupSource(machine = bigdatafierce_vm,
+        source = BackupSource(machine = bigdatafierce_vm,
           shareDir = BackupSrcDir(RelPath("home/nickdsc")),
           dirs = Seq(BackupSrcDir(RelPath(".ssh"))),
           mountType = LOCAL),
@@ -161,17 +160,17 @@ object Backups {
     */
   def defineBigdatafierceHZ1_Backups: Seq[BackupDef] = {
 
-    val domainspec_keyssBackup = new BackupDef(
+    val domainspec_keyssBackup = BackupDef(
       name = "domainspec_keys",
-      source = new BackupSource(machine = bigdatafierce_hz1,
+      source = BackupSource(machine = bigdatafierce_hz1,
         shareDir = BackupSrcDir(RelPath("home/domainspec")),
         dirs = Seq(BackupSrcDir(".ssh")),
         mountType = LOCAL),
       destinations = Seq(storagebox_hz1_destBackup))
 
-    val domainspec_user_homeBackup = new BackupDef(
+    val domainspec_user_homeBackup = BackupDef(
       name = "domainspec_user_home",
-      source = new BackupSource(machine = bigdatafierce_hz1,
+      source = BackupSource(machine = bigdatafierce_hz1,
         shareDir = BackupSrcDir(RelPath("home/domainspec")),
         dirs = Seq(BackupSrcDir(".bash")),
         mountType = LOCAL),
@@ -188,6 +187,14 @@ object MakeBackups extends App {
 
   override def main(args: Array[String]) {
 
+    case class Thing(myFieldA: Int, myFieldB: String)
+    case class Big(i: Int, b: Boolean, str: String, c: Char, t: Thing)
+
+//    import upickle.default._
+//    import upickle._
+//    write(Thing(1, "gg"))
+//    write(Big(1, true, "lol", 'Z', Thing(7, "")))
+
     val allBackups1 = Backups.defineBigdatafierceBackups
 
     val allBackups2 = Backups.defineBigdatafierce_vmBackups
@@ -196,7 +203,7 @@ object MakeBackups extends App {
 
     OSHandler.ensureRootsGoodToMountUnder
 
-    val nickdsc = new User("nickdsc", 1001, 1002)
+    val nickdsc = User("nickdsc", 1001, 1002)
 
     allBackups1 foreach { backup =>
 

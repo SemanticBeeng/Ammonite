@@ -205,7 +205,8 @@ lazy val hashbackup = project
       name := "ammonite-hashbackup",
       libraryDependencies ++= Seq(
 	      "net.jcazevedo" %% "moultingyaml" % "0.2",
-        "org.scalaz" %% "scalaz-core" % "7.2.2"
+        "org.scalaz" %% "scalaz-core" % "7.2.2",
+        "com.lihaoyi" %% "upickle" % "0.4.0"
       )
   )
 
