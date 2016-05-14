@@ -40,7 +40,11 @@ object OSHandler {
 
   }
 
-  def mountDirAs(/*machine: Machine, */ mountable: Mountable, user : User) : \/[Path, MountError] = {
+  /**
+    *
+    */
+  def mountDirAs[P <: BasePath](/*machine: Machine, */ mountable: Mountable[P], user : User) : \/[BasePath, MountError]
+  = {
 
     def codeToVal(res: CommandResult): \/[Path, impl.MountError] = {
       if (res.exitCode == 0)
@@ -52,7 +56,7 @@ object OSHandler {
     mountable.mountType match  {
 
       case LOCAL =>
-        \/.left(root / mountable.shareDir.path)
+        \/.left(mountable.shareDir.path)
 
       case SSHFS =>
         val shareName: String = mountable.shareName

@@ -32,10 +32,11 @@ object Backups {
   /**
     *
     */
-  def defineBigdatafierceBackups: Seq[BackupDef] = {
+  def defineBigdatafierceBackups: Seq[BackupDef[_]] = {
+
       val manual_backupsBackup = BackupDef(
         name = "manual_backups",
-        source = BackupSource(machine = bigdatafierce,
+        source = BackupSource[RelPath](machine = bigdatafierce,
           shareDir = BackupSrcDir('mydocs),
           dirs = Seq(BackupSrcDir("~backups")),
           mountType = CIFS),
@@ -43,7 +44,7 @@ object Backups {
 
       val nickdsc_keysBackup = BackupDef(
         name = nickdsc_keys,
-        source = BackupSource(machine = bigdatafierce,
+        source = BackupSource[RelPath](machine = bigdatafierce,
           shareDir = BackupSrcDir('mydocs),
           dirs = Seq(BackupSrcDir("Keys")),
           mountType = CIFS),
@@ -54,7 +55,7 @@ object Backups {
         */
       val nickdsc_keys2Backup = BackupDef(
         name = nickdsc_keys,
-        source = BackupSource(machine = bigdatafierce,
+        source = BackupSource[RelPath](machine = bigdatafierce,
           shareDir = BackupSrcDir('Users),
           dirs = Seq(BackupSrcDir(RelPath("nickdsc/.ssh"))),
           mountType = CIFS),
@@ -62,7 +63,7 @@ object Backups {
 
       val personal_and_corpBackup = BackupDef(
         name = "personal_and_corp",
-        source = BackupSource(machine = bigdatafierce,
+        source = BackupSource[RelPath](machine = bigdatafierce,
           shareDir = BackupSrcDir('mydocs),
           dirs = Seq(BackupSrcDir("Personal")),
           mountType = CIFS),
@@ -70,7 +71,7 @@ object Backups {
 
       val knowledgerepoBackup = BackupDef(
         name = "knowledgerepo",
-        source = BackupSource(machine = bigdatafierce,
+        source = BackupSource[RelPath](machine = bigdatafierce,
           shareDir = BackupSrcDir('mydocs),
           dirs = Seq(BackupSrcDir(RelPath("repos/knowledgerepo"))),
           mountType = CIFS),
@@ -78,7 +79,7 @@ object Backups {
 
       val project_sourcesBackup = BackupDef(
         name = "project_sources",
-        source = BackupSource(machine = bigdatafierce,
+        source = BackupSource[RelPath](machine = bigdatafierce,
           shareDir = BackupSrcDir('projects),
           dirs = Seq(BackupSrcDir(RelPath("."))),
           mountType = CIFS),
@@ -86,7 +87,7 @@ object Backups {
 
       val nickdsc_user_homeBackup = BackupDef(
         name = "nickdsc_user_home",
-        source = BackupSource(machine = bigdatafierce,
+        source = BackupSource[RelPath](machine = bigdatafierce,
           shareDir = BackupSrcDir('Users),
           dirs = Seq(BackupSrcDir(RelPath("nickdsc/.vagrant.d")),
             BackupSrcDir(RelPath("nickdsc/.x2go")),
@@ -102,7 +103,7 @@ object Backups {
 
       val virtual_machinessBackup = BackupDef(
         name = "virtual_machines",
-        source = BackupSource(machine = bigdatafierce,
+        source = BackupSource[RelPath](machine = bigdatafierce,
           shareDir = BackupSrcDir('vms),
           dirs = Seq(BackupSrcDir(RelPath("VirtualBox VMs/DevShell-Ubuntu")),
             BackupSrcDir(RelPath("VirtualBox VMs/MacKnowledge")),
@@ -123,20 +124,20 @@ object Backups {
   /**
     *
     */
-  def defineBigdatafierce_vmBackups: Seq[BackupDef] = {
+  def defineBigdatafierce_vmBackups: Seq[BackupDef[_]] = {
 
       val pure_dataBackup = BackupDef(
         name = "pure_data",
-        source = BackupSource(machine = bigdatafierce_vm,
-          shareDir = BackupSrcDir('datascience),
-          dirs = Seq(BackupSrcDir('marketdata)),
+        source = BackupSource[Path](machine = bigdatafierce_vm,
+          shareDir = BackupLocalSrcDir(root),
+          dirs = Seq(BackupSrcDir(RelPath("datascience/marketdata"))),
           mountType = LOCAL),
         destinations = naz1AndHz1)
 
       val nickdsc_user_homeBackup = BackupDef(
         name = "nickdsc_user_home",
-        source = BackupSource(machine = bigdatafierce_vm,
-          shareDir = BackupSrcDir(RelPath("home/nickdsc")),
+        source = BackupSource[Path](machine = bigdatafierce_vm,
+          shareDir = BackupLocalSrcDir(root/'home/'nickdsc),
           dirs = Seq(BackupSrcDir(RelPath(".bash")),
             BackupSrcDir(RelPath(".vim")),
             BackupSrcDir(RelPath(".smbcredentials")),
@@ -146,8 +147,8 @@ object Backups {
 
       val nickdsc_keysBackup = BackupDef(
         name = nickdsc_keys,
-        source = BackupSource(machine = bigdatafierce_vm,
-          shareDir = BackupSrcDir(RelPath("home/nickdsc")),
+        source = BackupSource[Path](machine = bigdatafierce_vm,
+          shareDir = BackupLocalSrcDir(root/'home/'nickdsc),
           dirs = Seq(BackupSrcDir(RelPath(".ssh"))),
           mountType = LOCAL),
         destinations = naz1AndHz1)
@@ -158,20 +159,20 @@ object Backups {
   /**
     *
     */
-  def defineBigdatafierceHZ1_Backups: Seq[BackupDef] = {
+  def defineBigdatafierceHZ1_Backups: Seq[BackupDef[_]] = {
 
-    val domainspec_keyssBackup = BackupDef(
+    val domainspec_keyssBackup = BackupDef[Path](
       name = "domainspec_keys",
-      source = BackupSource(machine = bigdatafierce_hz1,
-        shareDir = BackupSrcDir(RelPath("home/domainspec")),
+      source = BackupSource[Path](machine = bigdatafierce_hz1,
+        shareDir = BackupSrcDir(root/'home/'domainspec),
         dirs = Seq(BackupSrcDir(".ssh")),
         mountType = LOCAL),
       destinations = Seq(storagebox_hz1_destBackup))
 
-    val domainspec_user_homeBackup = BackupDef(
+    val domainspec_user_homeBackup = BackupDef[Path](
       name = "domainspec_user_home",
-      source = BackupSource(machine = bigdatafierce_hz1,
-        shareDir = BackupSrcDir(RelPath("home/domainspec")),
+      source = BackupSource[Path](machine = bigdatafierce_hz1,
+        shareDir = BackupSrcDir(root/'home/'domainspec),
         dirs = Seq(BackupSrcDir(".bash")),
         mountType = LOCAL),
       destinations = Seq(storagebox_hz1_destBackup))

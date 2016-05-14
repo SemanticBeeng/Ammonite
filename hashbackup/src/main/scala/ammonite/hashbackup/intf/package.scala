@@ -1,6 +1,6 @@
 package ammonite.hashbackup
 
-import ammonite.ops.Path
+import ammonite.ops.{RelPath, Path}
 import ammonite.hashbackup.intf.MountType.MountTypeVal
 import ammonite.hashbackup.intf.BackDestType.BackupDestVal
 
@@ -9,14 +9,14 @@ import ammonite.hashbackup.intf.BackDestType.BackupDestVal
   */
 package object intf {
 
-  import ammonite.ops.RelPath
+  import ammonite.ops.BasePath
 
   /**
     *
     */
-  sealed trait BackupDir {
+  sealed trait BackupDir[P <: BasePath] {
 
-    def path: RelPath
+    def path: P
   }
 
   sealed trait Local
@@ -32,34 +32,34 @@ package object intf {
     * A "backup source directory"
     * Can be either local or remote and mounted locally under [[BackupRoots.backupSourceMountDirs]]
     */
-  trait BackupSrcDir extends BackupDir with Src
+  trait BackupSrcDir[P <: BasePath] extends BackupDir[P] with Src
 
   /**
     * A "backup destination directory" associated to a  [[BackupDestination]] of type directory
     */
-  trait BackupDestDir extends BackupDir with Dest
+  trait BackupDestDir extends BackupDir[BasePath] with Dest
 
   // -----------------------------------------------------------
   /**
     * A "backup directory" local to the machine that run the backup.
     * The backup process will copy the archives to a [[BackupRemoteDestDir]] when archive
     */
-  trait BackupLocalDir extends BackupDir with Local
+  trait BackupLocalDir extends BackupDir[Path] with Local
 
-  trait BackupLocalSrcDir extends BackupSrcDir with Local
+  trait BackupLocalSrcDir extends BackupSrcDir[Path] with Local
 
   // -----------------------------------------------------------
   /**
     * A "backup source directory"; Can be local or remotely mounted
     */
-  trait BackupRemoteDir extends BackupDir with Remote
+  trait BackupRemoteDir extends BackupDir[BasePath] with Remote
 
   /**
     * A "backup source directory"; Can be local or remotely mounted
     */
-  trait BackupRemoteSrcDir extends BackupSrcDir with Remote
+  trait BackupRemoteSrcDir extends BackupSrcDir[BasePath] with Remote
 
-  trait BackupRemoteDestDir extends BackupDir with Remote with Dest
+  trait BackupRemoteDestDir extends BackupDir[BasePath] with Remote with Dest
 
   // -----------------------------------------------------------
   trait Machine {
@@ -90,11 +90,11 @@ package object intf {
     * A backup definition.
     * Note: a backup can only be done from a single machine
     */
-  trait BackupDef {
+  trait BackupDef[P <: BasePath] {
 
     def name: String
 
-    def source: BackupSource
+    def source: BackupSource[P]
 
     def destinations: Seq[BackupDestination]
   }
@@ -114,11 +114,11 @@ package object intf {
     def message : String
   }
 
-  trait Mountable {
+  trait Mountable[P <: BasePath] {
 
     def machine: Machine
 
-    def shareDir : BackupDir
+    def shareDir : BackupDir[P]
 
     def mountType: MountTypeVal
 
@@ -130,7 +130,7 @@ package object intf {
   /**
     * Cannot mix remote and local [[BackupSrcDir]] in the same [[BackupSource]]
     */
-  trait BackupSource extends Mountable {
+  trait BackupSource[P <: BasePath] extends Mountable[P] {
 
     def machine: Machine
 
@@ -141,12 +141,12 @@ package object intf {
       *   <li> a local directory if [[machine]] == backup machine ; type = [[BackupLocalSrcDir]]
       * </ul>
       */
-    def shareDir : BackupSrcDir
+    def shareDir : BackupSrcDir[P]
 
     /**
       * The children of [[shareDir]] that are backed-up
       */
-    def dirs: Seq[BackupSrcDir]
+    def dirs: Seq[BackupSrcDir[RelPath]]
 
     def mountType: MountTypeVal
 
@@ -156,7 +156,7 @@ package object intf {
   /**
     * A "backup destination"
     */
-  trait BackupDestination extends Mountable {
+  trait BackupDestination extends Mountable[RelPath] {
 
     def machine: Machine
 
