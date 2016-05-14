@@ -1,7 +1,7 @@
 package ammonite.hashbackup
 
 import ammonite.hashbackup.intf.MountType._
-import ammonite.ops.{Path, RelPath}
+import ammonite.ops.{root, Path, RelPath}
 import ammonite.hashbackup.intf.BackDestType.BackupDestVal
 import ammonite.hashbackup.intf.BackupDir
 
@@ -47,9 +47,11 @@ package object impl {
 
     def shareName: String = {
 
-//      if(shareDir.isInstanceOf[BackupLocalDir])
-//      assert(shareDir.path.segments.length == 1)
-      shareDir.path.toString
+      (if(mountType == LOCAL)
+        root/shareDir.path
+      else
+        shareDir.path).toString
+
     }
 
     def localMountPath = impl.machinePath(BackupRoots.backupMountDirs, machine) / shareDir.path
