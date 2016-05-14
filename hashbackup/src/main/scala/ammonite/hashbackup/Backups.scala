@@ -16,13 +16,19 @@ object Backups {
     dir = BackupRemoteDestDir("Backup"),
     mountType = SSHFS)
 
+  val storagebox_hz1_destBackup = BackupDestinationDir(
+    machine = storagebox_hz1,
+    kind = BackDestType.Directory,
+    dir = BackupRemoteDestDir("Backup"),
+    mountType = SSHFS)
+
   val manualBackups = new BackupDef(
     name = "manual_backups",
     source = new BackupSource(machine = bigdatafierce,
       shareDir = BackupSrcDir('mydocs),
       dirs = Seq(BackupSrcDir("~backups")),
       mountType = CIFS),
-    destinations= Seq(semanticbrainex_nas1_destBackup))
+    destinations= Seq(semanticbrainex_nas1_destBackup, storagebox_hz1_destBackup))
 
 }
 
