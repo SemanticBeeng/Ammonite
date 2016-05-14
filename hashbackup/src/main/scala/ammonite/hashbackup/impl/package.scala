@@ -54,8 +54,10 @@ package object impl {
 
     def localMountPath = impl.machinePath(BackupRoots.backupMountDirs, machine) / shareDir.path
 
-    //override def toString = s"Share name = $shareName; Dirs = $dirs; Local mount = $localMountPath"
-  }
+    override def toString = {
+        def sourcePaths = dirs map {d => shareName + "/" + d.path}
+        s"BackupSource(machine = $machine, sourcePaths = $sourcePaths, localMountPath = $localMountPath)" }
+      }
 
   /**
     *
@@ -102,7 +104,8 @@ package object impl {
       destinations map {d => mountDirAs(d, user)}
     }
 
-    //override def toString = s"Name = $name; Local path = $localPath; Source = {$source}; Mount at = $mountPath"
+    override def toString = s"BackupDef(name = $name; localPath = $localPath; " +
+      s"source = $source; mountPath =$mountPath)"
 
   }
 
