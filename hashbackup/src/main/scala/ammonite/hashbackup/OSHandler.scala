@@ -98,11 +98,11 @@ object OSHandler {
       s" hb config -c ${backup.localPath} cache-size-limit 100g",
       s" hb config -c ${backup.localPath} remote-update normal",
       s" hb rekey  -c ${backup.localPath} -k $key -p ask",
-      s" hb backup -D500m ${backup.sourcePaths} -c ${backup.localPath}"
+      s" hb backup -D500m ${backup.sourcePaths.mkString(", ")} -c ${backup.localPath}"
     )
 
     cmds foreach { cmd =>
-      print("\n>>> Executing >>> $cmd")
+      print(s"\n>>> Executing >>> $cmd")
     }
   }
 
