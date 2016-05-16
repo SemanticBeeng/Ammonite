@@ -85,6 +85,26 @@ object OSHandler {
     }
   }
 
+  /**
+    *
+    */
+  def executeBackup(backup: BackupDef[_]) = {
+
+    val key = "5dfe31efb14ad21c9410202d9c9e75978c70de2a3002f85da4a0db6a362f2be3"
+    val cmds = List(
+      s" hb init   -c ${backup.localPath}",
+      s" hb audit  -c ${backup.localPath} -a",
+      s" hb config -c ${backup.localPath} arc-size-limit 1gb",
+      s" hb config -c ${backup.localPath} cache-size-limit 100g",
+      s" hb config -c ${backup.localPath} remote-update normal",
+      s" hb rekey  -c ${backup.localPath} -k $key -p ask",
+      s" hb backup -D500m ${backup.sourcePaths} -c ${backup.localPath}"
+    )
+
+    cmds foreach { cmd =>
+      print("\n>>> Executing >>> $cmd")
+    }
+  }
 
   //val f: (Path, User, MountTypeVal) => Either[Path, MountError] = mountDirAs
 

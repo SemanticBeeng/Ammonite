@@ -110,6 +110,7 @@ package object impl {
                        destinations: Seq[intf.BackupDestination])
     extends intf.BackupDef[P] {
 
+
     /**
       * Full path to the (local) "backup directory"
       */
@@ -120,13 +121,15 @@ package object impl {
       */
     def mountPath : Path = machinePath(BackupRoots.backupMountDirs, source.machine) / name
 
+    def sourcePaths: Seq[Path] = source.dirs map { d => source.localMountPath / d.path }
+
     import ammonite.hashbackup.OSHandler._
 
     def mountSourcePaths(user: User): \/[Seq[Path], \/[Path, intf.MountError]] = {
 
       val result: \/[Path, intf.MountError] = mountDirAs[P](source, user)
       if(result.isLeft) {
-        -\/(source.dirs map { d => source.localMountPath / d.path })
+        -\/(sourcePaths)
       } else {
         \/-(result)
       }
@@ -138,6 +141,14 @@ package object impl {
     def mountRemoteDestPaths(user: User): Seq[\/[BasePath, intf.MountError]] = {
 
       destinations map {d => mountDirAs(d, user)}
+    }
+
+    /**
+      *
+      *
+      */
+    def execute() = {
+      executeBackup(this)
     }
 
     override def toString = s"BackupDef(name = $name; localPath = $localPath; " +

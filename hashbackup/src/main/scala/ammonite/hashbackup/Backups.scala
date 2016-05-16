@@ -223,6 +223,8 @@ object MakeBackups extends App {
       }
 
       backup.mountRemoteDestPaths(nickdsc)
+
+      backup.execute()
     }
 
     executeBackup(allBackups1)

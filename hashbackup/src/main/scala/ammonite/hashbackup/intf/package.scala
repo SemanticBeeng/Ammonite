@@ -98,6 +98,12 @@ package object intf {
     def source: BackupSource[P]
 
     def destinations: Seq[BackupDestination]
+
+    def localPath : Path
+
+    def mountPath : Path
+
+    def sourcePaths: Seq[Path]
   }
 
   // -----------------------------------------------------------
