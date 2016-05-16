@@ -132,6 +132,8 @@ package object intf {
     def shareName : String
 
     def localMountPath : Path
+
+    def generateDestConfContent : String
   }
 
   /**

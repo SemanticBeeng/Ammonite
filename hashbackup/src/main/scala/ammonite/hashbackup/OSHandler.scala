@@ -3,6 +3,7 @@ package ammonite.hashbackup
 import java.nio.file.FileSystemException
 import java.nio.file.attribute.PosixFilePermission._
 
+import ammonite.hashbackup.impl.BackupDestinationDir
 import ammonite.ops._
 import ammonite.ops.ImplicitWd._
 import ammonite.hashbackup.intf._
@@ -83,6 +84,40 @@ object OSHandler {
         \/.right(new impl.MountError(-1, "Unknown mount type" + m))
 
     }
+  }
+
+  /**
+    * @example
+      * DestName semanticbrainex_nas1
+    * Type Dir
+    * Dir /mnt/backups/bckp_dests/semanticbrainex_nas1/Backup/manual_backup
+    *
+    * DestName StorageBox_HZ1
+    * Type Dir
+    * Dir /mnt/backups/bckp_dests/storagebox_hz1/Backup/manual_backup
+    */
+  def generateDestConf(backup : BackupDef[_]) = {
+
+      def genDestEntryFor(backupName: String, d: intf.BackupDestination): String = {
+
+        d match {
+          case d:intf.BackupDestinationDir =>
+            s"DestName ${d.machine.name}\n " +
+            s"Type Dir\n" +
+            s"Dir ${d.localMountPath}/backupName\n\n"
+
+          case d:intf.BackupDestinationB2 =>
+            s"DestName ${d.machine.name}\n " +
+            s"Type B2\n" +
+            s"Dir ${d.localMountPath}/backupName\n\n"
+
+          case _ =>
+            Predef.assert(assertion = false, s"Unexpected backup destination $d")
+            s"Unknown destination $d"
+        }
+      }
+
+      backup.destinations map {d => genDestEntryFor(backup.name, d)}
   }
 
   /**

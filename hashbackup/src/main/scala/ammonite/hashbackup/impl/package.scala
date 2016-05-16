@@ -1,6 +1,6 @@
 package ammonite.hashbackup
 
-import ammonite.hashbackup.intf.BackupDir
+import ammonite.hashbackup.intf.{BackupDef, BackupDir}
 import ammonite.hashbackup.intf.MountType._
 import ammonite.ops.{RelPath, BasePath, Path}
 import ammonite.hashbackup.intf.BackDestType.BackupDestVal
@@ -72,6 +72,41 @@ package object impl {
         impl.machinePath(BackupRoots.backupSourceMountDirs, machine) / shareDir.path.asInstanceOf[RelPath]
       }
     }
+
+    /**
+      * @example
+      * DestName semanticbrainex_nas1
+      * Type Dir
+      * Dir /mnt/backups/bckp_dests/semanticbrainex_nas1/Backup/manual_backup
+      *
+      * DestName StorageBox_HZ1
+      * Type Dir
+      * Dir /mnt/backups/bckp_dests/storagebox_hz1/Backup/manual_backup
+      */
+    def generateDestConfContent = {
+
+      def genDestEntryFor(d: intf.BackupDestination)(implicit backup: BackupDef[_]): String = {
+
+        d match {
+          case d:intf.BackupDestinationDir =>
+            s"DestName ${d.machine.name}\n " +
+              s"Type Dir\n" +
+              s"Dir ${d.localMountPath}/${backup.name}\n\n"
+
+          case d:intf.BackupDestinationB2 =>
+            s"DestName ${d.machine.name}\n " +
+              s"Type B2\n" +
+              s"Dir ${d.localMountPath}/${backup.name}\n\n"
+
+          case _ =>
+            Predef.assert(assertion = false, s"Unexpected backup destination $d")
+            s"Unknown destination $d"
+        }
+      }
+
+      destinations map {d => genDestEntryFor(d)}
+    }
+
 
     override def toString = {
         def sourcePaths = dirs map {d => shareName + "/" + d.path}
