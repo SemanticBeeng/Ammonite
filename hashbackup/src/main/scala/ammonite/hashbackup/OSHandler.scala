@@ -43,10 +43,11 @@ object OSHandler {
   /**
     *
     */
-  def mountDirAs[P <: BasePath](/*machine: Machine, */ mountable: Mountable[P], user : User) : \/[BasePath, MountError]
-  = {
+  def mountDirAs[P <: BasePath](mountable: intf.Mountable[P], user : User) : \/[Path, intf.MountError] = {
 
-    def codeToVal(res: CommandResult): \/[Path, impl.MountError] = {
+    def executeCmd(command: String): \/[Path, intf.MountError] = {
+
+      val res: CommandResult = CommandResult(0, Seq.empty)//@todo %%(command)
       if (res.exitCode == 0)
         \/.left(mountable.localMountPath)
       else
@@ -56,17 +57,17 @@ object OSHandler {
     mountable.mountType match  {
 
       case LOCAL =>
-        \/.left(mountable.shareDir.path)
+        \/.left(mountable.shareDir.path.asInstanceOf[Path]) //@todo fix this
 
       case SSHFS =>
         val shareName: String = mountable.shareName
         val localPath = mountable.localMountPath.toString
 
         val cmd = s"sudo sshfs -o uid=${user.UID},gid=${user.GID},reconnect " +
-                  s"${mountable.machine.address}:$shareName $localPath"
-        println(s"Executing $cmd")
+                  s"${mountable.machine.address}:/$shareName $localPath"
+        println(s"\n>>> Executing >>> $cmd")
 
-        codeToVal(%%(cmd))
+        executeCmd(cmd)
 
       case CIFS =>
         val shareName: String = mountable.shareName
@@ -76,7 +77,7 @@ object OSHandler {
                   s"//${mountable.machine.address}/$shareName $localPath"
         println(s"Executing $cmd")
 
-        codeToVal(%%(cmd))
+        executeCmd(cmd)
 
       case m =>
         \/.right(new impl.MountError(-1, "Unknown mount type" + m))

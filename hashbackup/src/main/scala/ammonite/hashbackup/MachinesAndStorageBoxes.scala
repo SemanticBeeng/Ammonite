@@ -17,7 +17,7 @@ object MachinesAndStorageBoxes {
 
   // Storage boxes
   val semanticbrainex_nas1 = Machine("semanticbrainex_nas1", "192.168.100.6")
-  val storagebox_hz1 = Machine("storagebox_hz1", "u126308.your-storagebox.de")
+  val storagebox_hz1 = Machine("storagebox_hz1", "u126308@u126308.your-storagebox.de") //@todo fixL hardcoded user id
   val storagebox_b21 = Machine("storagebox_b21", "sftree-0000.backblaze.com/b2_browse_files.htm?bucketId=c8e7e3be614383c055420a1b")
 
 }

@@ -5,6 +5,9 @@ import ammonite.hashbackup.intf.MountType.{LOCAL, SSHFS, CIFS}
 import ammonite.hashbackup.intf.BackDestType
 import ammonite.hashbackup.impl._
 import ammonite.hashbackup.MachinesAndStorageBoxes._
+
+import scalaz.\/
+
 /**
   *
   */
@@ -16,7 +19,7 @@ object Backups {
   val semanticbrainex_nas1_destBackup = BackupDestinationDir(
     machine = semanticbrainex_nas1,
     kind = BackDestType.Directory,
-    dir = BackupRemoteDestDir("Backup"),
+    dir = BackupRemoteDestDir(RelPath("mnt/HD/HD_a2/Backup")),
     mountType = SSHFS)
 
   val storagebox_hz1_destBackup = BackupDestinationDir(
@@ -206,32 +209,25 @@ object MakeBackups extends App {
 
     val nickdsc = User("nickdsc", 1001, 1002)
 
-    allBackups1 foreach { backup =>
+    /**
+      *
+      */
+    def executeBackup(backups : Seq[BackupDef[_]]) = backups foreach { backup =>
 
       println(backup)
 
-      //      backup.mountSourcePaths(nickdsc)
-      //
-      //      backup.mountRemoteDestPaths(nickdsc)
+      val result = backup.mountSourcePaths(nickdsc)
+      val paths = result.toEither.left
+      if(result.isRight) {
+        print(s"Failed to mount source result ${result.toEither.right}")
+      }
+
+      backup.mountRemoteDestPaths(nickdsc)
     }
 
-    allBackups2 foreach { backup =>
-
-      println(backup)
-
-      //      backup.mountSourcePaths(nickdsc)
-      //
-      //      backup.mountRemoteDestPaths(nickdsc)
-    }
-
-    allBackups3 foreach { backup =>
-
-      println(backup)
-
-      //      backup.mountSourcePaths(nickdsc)
-      //
-      //      backup.mountRemoteDestPaths(nickdsc)
-    }
+    executeBackup(allBackups1)
+    executeBackup(allBackups2)
+    executeBackup(allBackups3)
   }
 
 }

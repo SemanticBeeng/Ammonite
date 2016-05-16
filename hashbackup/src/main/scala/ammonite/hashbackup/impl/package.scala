@@ -5,7 +5,7 @@ import ammonite.hashbackup.intf.MountType._
 import ammonite.ops.{RelPath, BasePath, Path}
 import ammonite.hashbackup.intf.BackDestType.BackupDestVal
 
-import scalaz.\/
+import scalaz.{-\/, \/-, \/}
 
 /**
   *
@@ -90,11 +90,11 @@ package object impl {
 
     override def shareDir: BackupDir[RelPath] = dir.asInstanceOf[BackupDir[RelPath]]
 
-    override def shareName: String = shareDir.path.toString //.replace('/', '#')
+    override def shareName: String = shareDir.path.toString
 
     override def localMountPath: Path = {
       Predef.assert(shareDir.path.isInstanceOf[RelPath])
-      impl.machinePath(BackupRoots.backupDestinationDirs, machine) / shareDir.path.asInstanceOf[RelPath]
+      impl.machinePath(BackupRoots.backupDestinationDirs, machine) / shareDir.path.segments.last
     }
 
     override def toString = s"BackupDestinationDir(machine = $machine, mountType = $mountType, " +
@@ -122,9 +122,14 @@ package object impl {
 
     import ammonite.hashbackup.OSHandler._
 
-    def mountSourcePaths(user: User): \/[BasePath, intf.MountError] = {
+    def mountSourcePaths(user: User): \/[Seq[Path], \/[Path, intf.MountError]] = {
 
-      mountDirAs(source, user)
+      val result: \/[Path, intf.MountError] = mountDirAs[P](source, user)
+      if(result.isLeft) {
+        -\/(source.dirs map { d => source.localMountPath / d.path })
+      } else {
+        \/-(result)
+      }
     }
 
     /**

@@ -17,6 +17,7 @@ package object intf {
   sealed trait BackupDir[P <: BasePath] {
 
     def path: P
+
   }
 
   sealed trait Local
