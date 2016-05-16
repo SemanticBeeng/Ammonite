@@ -104,6 +104,8 @@ package object intf {
     def mountPath : Path
 
     def sourcePaths: Seq[Path]
+
+    def generateDestConfContent : String
   }
 
   // -----------------------------------------------------------
@@ -132,8 +134,6 @@ package object intf {
     def shareName : String
 
     def localMountPath : Path
-
-    def generateDestConfContent : String
   }
 
   /**

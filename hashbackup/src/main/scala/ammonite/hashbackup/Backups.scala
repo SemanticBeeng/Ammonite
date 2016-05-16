@@ -28,7 +28,7 @@ object Backups {
     dir = BackupRemoteDestDir("Backup"),
     mountType = SSHFS)
 
-  private val naz1AndHz1: Seq[BackupDestinationDir] = Seq(semanticbrainex_nas1_destBackup, storagebox_hz1_destBackup)
+  private val naz1AndHz1: Seq[BackupDestinationDir] = Seq(semanticbrainex_nas1_destBackup/*, storagebox_hz1_destBackup*/)
 
   val nickdsc_keys: String = "nickdsc_keys"
 
@@ -80,13 +80,13 @@ object Backups {
           mountType = CIFS),
         destinations = naz1AndHz1)
 
-      val project_sourcesBackup = BackupDef(
-        name = "project_sources",
-        source = BackupSource[RelPath](machine = bigdatafierce,
-          shareDir = BackupSrcDir('projects),
-          dirs = Seq(BackupSrcDir(RelPath("."))),
-          mountType = CIFS),
-        destinations = naz1AndHz1)
+//      val project_sourcesBackup = BackupDef(
+//        name = "project_sources",
+//        source = BackupSource[RelPath](machine = bigdatafierce,
+//          shareDir = BackupSrcDir('projects),
+//          dirs = Seq(BackupSrcDir(RelPath("."))),
+//          mountType = CIFS),
+//        destinations = naz1AndHz1)
 
       val nickdsc_user_homeBackup = BackupDef(
         name = "nickdsc_user_home",
@@ -104,24 +104,24 @@ object Backups {
           mountType = CIFS),
         destinations = naz1AndHz1)
 
-      val virtual_machinessBackup = BackupDef(
-        name = "virtual_machines",
-        source = BackupSource[RelPath](machine = bigdatafierce,
-          shareDir = BackupSrcDir('vms),
-          dirs = Seq(BackupSrcDir(RelPath("VirtualBox VMs/DevShell-Ubuntu")),
-            BackupSrcDir(RelPath("VirtualBox VMs/MacKnowledge")),
-            BackupSrcDir(RelPath("VirtualBox VMs/disks"))),
-          mountType = CIFS),
-        destinations = naz1AndHz1)
+//      val virtual_machinessBackup = BackupDef(
+//        name = "virtual_machines",
+//        source = BackupSource[RelPath](machine = bigdatafierce,
+//          shareDir = BackupSrcDir('vms),
+//          dirs = Seq(BackupSrcDir(RelPath("VirtualBox VMs/DevShell-Ubuntu")),
+//            BackupSrcDir(RelPath("VirtualBox VMs/MacKnowledge")),
+//            BackupSrcDir(RelPath("VirtualBox VMs/disks"))),
+//          mountType = CIFS),
+//        destinations = naz1AndHz1)
 
       Seq(manual_backupsBackup,
         nickdsc_keysBackup,
         nickdsc_keys2Backup,
         personal_and_corpBackup,
         knowledgerepoBackup,
-        project_sourcesBackup,
-        nickdsc_user_homeBackup,
-        virtual_machinessBackup)
+        //@ todo project_sourcesBackup,
+        nickdsc_user_homeBackup/*,@todo
+        virtual_machinessBackup*/)
   }
 
   /**
@@ -221,6 +221,7 @@ object MakeBackups extends App {
       if(result.isRight) {
         print(s"Failed to mount source result ${result.toEither.right}")
       }
+      backup.generateDestConfFile()
 
       backup.mountRemoteDestPaths(nickdsc)
 
@@ -229,7 +230,7 @@ object MakeBackups extends App {
 
     executeBackup(allBackups1)
     executeBackup(allBackups2)
-    executeBackup(allBackups3)
+    //executeBackup(allBackups3)
   }
 
 }

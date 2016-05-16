@@ -73,41 +73,6 @@ package object impl {
       }
     }
 
-    /**
-      * @example
-      * DestName semanticbrainex_nas1
-      * Type Dir
-      * Dir /mnt/backups/bckp_dests/semanticbrainex_nas1/Backup/manual_backup
-      *
-      * DestName StorageBox_HZ1
-      * Type Dir
-      * Dir /mnt/backups/bckp_dests/storagebox_hz1/Backup/manual_backup
-      */
-    def generateDestConfContent = {
-
-      def genDestEntryFor(d: intf.BackupDestination)(implicit backup: BackupDef[_]): String = {
-
-        d match {
-          case d:intf.BackupDestinationDir =>
-            s"DestName ${d.machine.name}\n " +
-              s"Type Dir\n" +
-              s"Dir ${d.localMountPath}/${backup.name}\n\n"
-
-          case d:intf.BackupDestinationB2 =>
-            s"DestName ${d.machine.name}\n " +
-              s"Type B2\n" +
-              s"Dir ${d.localMountPath}/${backup.name}\n\n"
-
-          case _ =>
-            Predef.assert(assertion = false, s"Unexpected backup destination $d")
-            s"Unknown destination $d"
-        }
-      }
-
-      destinations map {d => genDestEntryFor(d)}
-    }
-
-
     override def toString = {
         def sourcePaths = dirs map {d => shareName + "/" + d.path}
 
@@ -180,6 +145,46 @@ package object impl {
 
     /**
       *
+      */
+    def generateDestConfFile() = {
+      generateDestConf(this)
+    }
+
+    /**
+      * @example
+      * DestName semanticbrainex_nas1
+      * Type Dir
+      * Dir /mnt/backups/bckp_dests/semanticbrainex_nas1/Backup/manual_backup
+      *
+      * DestName StorageBox_HZ1
+      * Type Dir
+      * Dir /mnt/backups/bckp_dests/storagebox_hz1/Backup/manual_backup
+      */
+    def generateDestConfContent : String = {
+
+      def genDestEntryFor(backup: BackupDef[_], d: intf.BackupDestination) : String = {
+
+        d match {
+          case d:intf.BackupDestinationDir =>
+            s"DestName ${d.machine.name}\n" +
+              s"Type Dir\n" +
+              s"Dir ${d.localMountPath}/${backup.name}\n\n"
+
+          case d:intf.BackupDestinationB2 =>
+            s"DestName ${d.machine.name}\n" +
+              s"Type B2\n" +
+              s"Dir ${d.localMountPath}/${backup.name}\n"
+
+          case _ =>
+            Predef.assert(assertion = false, s"Unexpected backup destination $d")
+            s"Unknown destination $d"
+        }
+      }
+
+      (destinations map {d => genDestEntryFor(this, d)}) mkString "\n"
+    }
+
+    /**
       *
       */
     def execute() = {

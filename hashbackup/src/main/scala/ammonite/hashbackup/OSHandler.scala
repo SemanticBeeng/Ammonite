@@ -1,6 +1,6 @@
 package ammonite.hashbackup
 
-import java.nio.file.FileSystemException
+import java.nio.file.{StandardOpenOption, FileSystemException}
 import java.nio.file.attribute.PosixFilePermission._
 
 import ammonite.hashbackup.impl.BackupDestinationDir
@@ -98,26 +98,11 @@ object OSHandler {
     */
   def generateDestConf(backup : BackupDef[_]) = {
 
-      def genDestEntryFor(backupName: String, d: intf.BackupDestination): String = {
-
-        d match {
-          case d:intf.BackupDestinationDir =>
-            s"DestName ${d.machine.name}\n " +
-            s"Type Dir\n" +
-            s"Dir ${d.localMountPath}/backupName\n\n"
-
-          case d:intf.BackupDestinationB2 =>
-            s"DestName ${d.machine.name}\n " +
-            s"Type B2\n" +
-            s"Dir ${d.localMountPath}/backupName\n\n"
-
-          case _ =>
-            Predef.assert(assertion = false, s"Unexpected backup destination $d")
-            s"Unknown destination $d"
-        }
-      }
-
-      backup.destinations map {d => genDestEntryFor(backup.name, d)}
+    val destConfigFileName: Path = backup.localPath / "dest.conf"
+//    if (exists(destConfigFileName)) {
+//     rm ! destConfigFileName
+//    }
+    write.over(destConfigFileName, backup.generateDestConfContent)
   }
 
   /**
