@@ -108,6 +108,8 @@ package object intf {
     def sourcePathsAsText: String
 
     def generateDestConfContent : String
+
+    def generateBackupCommands : (List[String], List[String], List[String])
   }
 
   // -----------------------------------------------------------
@@ -119,7 +121,7 @@ package object intf {
     def GID : Int
   }
 
-  trait MountError {
+  trait ExecutionError {
     def result : Int
 
     def message : String

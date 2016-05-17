@@ -1,8 +1,8 @@
 package ammonite.hashbackup
 
-import ammonite.hashbackup.intf.{BackupDestination, BackupDir}
+import ammonite.ops.{RelPath, BasePath, Path}
+import ammonite.hashbackup.intf.BackupDir
 import ammonite.hashbackup.intf.MountType._
-import ammonite.ops.{/, RelPath, BasePath, Path}
 import ammonite.hashbackup.intf.BackDestType.BackupDestVal
 
 import scalaz.{-\/, \/-, \/}
@@ -65,7 +65,7 @@ package object impl {
       if (mountType == LOCAL) {
         // Expect a root relative path
         Predef.assert(shareDir.path.isInstanceOf[Path])
-        /*root / */shareDir.path.asInstanceOf[Path]
+        shareDir.path.asInstanceOf[Path]
       }
       else {
         Predef.assert(shareDir.path.isInstanceOf[RelPath])
@@ -102,15 +102,6 @@ package object impl {
       s"localMountPath = $localMountPath)"
   }
 
-//  object BackupDef {
-//
-//    def apply[P <: BasePath](name: String,
-//              source: intf.BackupSource[P],
-//              destinations: Seq[intf.BackupDestination]): BackupDef[P] = {
-//
-//      new BackupDef[P](name, source, destinations map {d => d.copyForBackup(name)})
-//    }
-//  }
   /**
     * Backup definition
     */
@@ -118,12 +109,6 @@ package object impl {
                        source: intf.BackupSource[P],
                        destinations: Seq[intf.BackupDestination])
     extends intf.BackupDef[P] {
-
-//    override def name: String = _name
-//
-//    override def source: intf.BackupSource[P] = _source
-//
-//    override def destinations: Seq[BackupDestination] = _destinations
 
     /**
       * Full path to the (local) "backup directory"
@@ -139,11 +124,14 @@ package object impl {
 
     def sourcePathsAsText :String = sourcePaths.mkString(", ")
 
-    import ammonite.hashbackup.OSHandler._
+    /**
+      *
+      */
+    def mountSourcePaths(user: User): \/[Seq[Path], \/[Path, intf.ExecutionError]] = {
 
-    def mountSourcePaths(user: User): \/[Seq[Path], \/[Path, intf.MountError]] = {
+      import ammonite.hashbackup.OSHandler._
 
-      val result: \/[Path, intf.MountError] = mountDirAs[P](source, user)
+      val result: \/[Path, intf.ExecutionError] = mountDirAs[P](source, user)
       if(result.isLeft) {
         -\/(sourcePaths)
       } else {
@@ -154,16 +142,11 @@ package object impl {
     /**
       *
       */
-    def mountRemoteDestPaths(user: User): Seq[\/[BasePath, intf.MountError]] = {
+    def mountRemoteDestPaths(user: User): Seq[\/[BasePath, intf.ExecutionError]] = {
+
+      import ammonite.hashbackup.OSHandler._
 
       destinations map {d => mountDirAs(d, user)}
-    }
-
-    /**
-      *
-      */
-    def generateDestConfFile() = {
-      generateDestConf(this)
     }
 
     /**
@@ -199,13 +182,46 @@ package object impl {
 
       "# Generated : DO NOT MODIFY\n" +
       "#\n" +
-      (destinations map {d => genDestEntryFor(this, d)}) mkString "\n"
+        ((destinations map {d => genDestEntryFor(this, d)}) mkString "\n")
+    }
+
+    /**
+      *
+      */
+    def generateBackupCommands: (List[String], List[String], List[String]) = {
+
+      val key = "5dfe31efb14ad21c9410202d9c9e75978c70de2a3002f85da4a0db6a362f2be3"
+      val dedupSize = "500m"
+
+      val cmdsInit = List(
+        s" hb init     -c $localPath",
+        s" hb audit    -c $localPath -a",
+        s" hb config   -c $localPath arc-size-limit 1gb",
+        s" hb config   -c $localPath cache-size-limit 100g",
+        s" hb config   -c $localPath remote-update normal",
+        s" hb rekey    -c $localPath -k $key -p ask"
+      )
+
+      val cmdExec = List(
+        s" hb backup   -c $localPath -D $dedupSize $sourcePathsAsText",
+        s" hb selftest -c $localPath -v5 $sourcePathsAsText",
+        s" hb dest     -c $localPath sync"
+      )
+
+      val cmdOther = List(
+        s" hb selftest -c $localPath -v5 $sourcePathsAsText",
+        s" hb dest     -c $localPath sync"
+      )
+
+      (cmdsInit, cmdExec, cmdOther)
     }
 
     /**
       *
       */
     def execute() = {
+      import ammonite.hashbackup.OSHandler._
+
       executeBackup(this)
     }
 
@@ -214,7 +230,7 @@ package object impl {
 
   }
 
-  case class MountError(result : Int, message : String) extends intf.MountError {
+  case class ExecutionError(result : Int, message : String) extends intf.ExecutionError {
 
   }
 

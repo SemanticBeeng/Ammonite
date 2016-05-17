@@ -44,15 +44,15 @@ object OSHandler {
     *
     */
   def mountDirAs[P <: BasePath](mountable: intf.Mountable[P], user : User) : \/[Path, intf
-  .MountError] = {
+  .ExecutionError] = {
 
-    def executeCmd(command: String): \/[Path, intf.MountError] = {
+    def executeCmd(command: String): \/[Path, intf.ExecutionError] = {
 
       val res: CommandResult = CommandResult(0, Seq.empty)//@todo %%(command)
       if (res.exitCode == 0)
         \/.left(mountable.localMountPath)
       else
-        \/.right(new impl.MountError(res.exitCode, res.out.string))
+        \/.right(new impl.ExecutionError(res.exitCode, res.out.string))
     }
 
     mountable.mountType match  {
@@ -81,7 +81,7 @@ object OSHandler {
         executeCmd(cmd)
 
       case m =>
-        \/.right(new impl.MountError(-1, "Unknown mount type" + m))
+        \/.right(new impl.ExecutionError(-1, "Unknown mount type" + m))
 
     }
   }
@@ -119,22 +119,22 @@ object OSHandler {
 //        \/.right(new impl.MountError(res.exitCode, res.out.string))
 //    }
 
-    val key = "5dfe31efb14ad21c9410202d9c9e75978c70de2a3002f85da4a0db6a362f2be3"
-    val cmds = List(
-      s" hb init     -c ${backup.localPath}",
-      s" hb audit    -c ${backup.localPath} -a",
-      s" hb config   -c ${backup.localPath} arc-size-limit 1gb",
-      s" hb config   -c ${backup.localPath} cache-size-limit 100g",
-      s" hb config   -c ${backup.localPath} remote-update normal",
-      s" hb rekey    -c ${backup.localPath} -k $key -p ask",
-      s" hb backup -D500m ${backup.sourcePathsAsText} -c ${backup.localPath}",
-      s" hb selftest -c ${backup.localPath} -v5 ${backup.sourcePathsAsText}",
-      s" hb dest     -c ${backup.localPath} sync"
-    )
+    val cmds = backup.generateBackupCommands
 
-    cmds foreach { cmd =>
+    val cmdsInit: List[String] = cmds._1
+    cmdsInit foreach { cmd =>
       print(s"\n>>> Executing >>> $cmd")
     }
+    generateDestConf(backup)
+
+    val cmdsExec: String = cmds._2.head
+    print(s"\n>>> Executing >>> $cmdsExec")
+
+    val cmdsOther: List[String] = cmds._3
+    cmdsOther foreach { cmd =>
+      print(s"\n>>> Executing >>> $cmd")
+    }
+
   }
 
   //val f: (Path, User, MountTypeVal) => Either[Path, MountError] = mountDirAs

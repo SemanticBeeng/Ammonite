@@ -214,6 +214,7 @@ object MakeBackups extends App {
       */
     def executeBackup(backups : Seq[BackupDef[_]]) = backups foreach { backup =>
 
+      println("\n*******************************")
       println(backup)
 
       val result = backup.mountSourcePaths(nickdsc)
@@ -221,7 +222,6 @@ object MakeBackups extends App {
       if(result.isRight) {
         print(s"Failed to mount source result ${result.toEither.right}")
       }
-      backup.generateDestConfFile()
 
       backup.mountRemoteDestPaths(nickdsc)
 
