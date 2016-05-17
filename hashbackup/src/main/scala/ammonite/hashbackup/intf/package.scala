@@ -105,6 +105,8 @@ package object intf {
 
     def sourcePaths: Seq[Path]
 
+    def sourcePathsAsText: String
+
     def generateDestConfContent : String
   }
 

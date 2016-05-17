@@ -110,15 +110,26 @@ object OSHandler {
     */
   def executeBackup(backup: BackupDef[_]) = {
 
+//    def executeCmd(command: String): \/[Path, Int] = {
+//
+//      val res: CommandResult = CommandResult(0, Seq.empty)//@todo %%(command)
+//      if (res.exitCode == 0)
+//        \/.left(mountable.localMountPath)
+//      else
+//        \/.right(new impl.MountError(res.exitCode, res.out.string))
+//    }
+
     val key = "5dfe31efb14ad21c9410202d9c9e75978c70de2a3002f85da4a0db6a362f2be3"
     val cmds = List(
-      s" hb init   -c ${backup.localPath}",
-      s" hb audit  -c ${backup.localPath} -a",
-      s" hb config -c ${backup.localPath} arc-size-limit 1gb",
-      s" hb config -c ${backup.localPath} cache-size-limit 100g",
-      s" hb config -c ${backup.localPath} remote-update normal",
-      s" hb rekey  -c ${backup.localPath} -k $key -p ask",
-      s" hb backup -D500m ${backup.sourcePaths.mkString(", ")} -c ${backup.localPath}"
+      s" hb init     -c ${backup.localPath}",
+      s" hb audit    -c ${backup.localPath} -a",
+      s" hb config   -c ${backup.localPath} arc-size-limit 1gb",
+      s" hb config   -c ${backup.localPath} cache-size-limit 100g",
+      s" hb config   -c ${backup.localPath} remote-update normal",
+      s" hb rekey    -c ${backup.localPath} -k $key -p ask",
+      s" hb backup -D500m ${backup.sourcePathsAsText} -c ${backup.localPath}",
+      s" hb selftest -c ${backup.localPath} -v5 ${backup.sourcePathsAsText}",
+      s" hb dest     -c ${backup.localPath} sync"
     )
 
     cmds foreach { cmd =>

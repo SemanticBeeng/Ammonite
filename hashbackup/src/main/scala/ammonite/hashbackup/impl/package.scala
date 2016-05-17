@@ -137,6 +137,8 @@ package object impl {
 
     def sourcePaths: Seq[Path] = source.dirs map { d => source.localMountPath / d.path }
 
+    def sourcePathsAsText :String = sourcePaths.mkString(", ")
+
     import ammonite.hashbackup.OSHandler._
 
     def mountSourcePaths(user: User): \/[Seq[Path], \/[Path, intf.MountError]] = {
@@ -195,6 +197,8 @@ package object impl {
         }
       }
 
+      "# Generated : DO NOT MODIFY\n" +
+      "#\n" +
       (destinations map {d => genDestEntryFor(this, d)}) mkString "\n"
     }
 
