@@ -166,13 +166,10 @@ package object intf {
     * A "backup destination"
     */
   trait BackupDestination extends Mountable[RelPath] {
-    type ThisType <: BackupDestination
 
     def machine: Machine
 
     def kind: BackupDestVal
-
-    def copyForBackup(backupName: String): ThisType
   }
 
   /**
