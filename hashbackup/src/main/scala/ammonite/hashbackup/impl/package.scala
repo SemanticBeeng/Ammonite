@@ -1,8 +1,8 @@
 package ammonite.hashbackup
 
-import ammonite.hashbackup.intf.{BackupDef, BackupDir}
+import ammonite.hashbackup.intf.{BackupDestination, BackupDir}
 import ammonite.hashbackup.intf.MountType._
-import ammonite.ops.{RelPath, BasePath, Path}
+import ammonite.ops.{/, RelPath, BasePath, Path}
 import ammonite.hashbackup.intf.BackDestType.BackupDestVal
 
 import scalaz.{-\/, \/-, \/}
@@ -83,8 +83,16 @@ package object impl {
   /**
     *
     */
-  case class BackupDestinationDir(machine: Machine, kind: BackupDestVal, dir: BackupRemoteDestDir, mountType : MountTypeVal)
+  case class BackupDestinationDir(machine: Machine, kind: BackupDestVal,
+                                  dir: BackupRemoteDestDir, mountType : MountTypeVal)
     extends intf.BackupDestinationDir {
+
+    type ThisType = BackupDestinationDir
+
+    def copyForBackup(backupName: String): BackupDestinationDir = {
+
+      copy(dir = dir.copy(path = dir.path / backupName))
+    }
 
     def path : Path  = machinePath(BackupRoots.backupDirs, machine) / dir.path
 
@@ -94,7 +102,9 @@ package object impl {
 
     override def localMountPath: Path = {
       Predef.assert(shareDir.path.isInstanceOf[RelPath])
-      impl.machinePath(BackupRoots.backupDestinationDirs, machine) / shareDir.path.segments.last
+
+      val p = shareDir.path.segments.takeRight(2).mkString("/")
+      impl.machinePath(BackupRoots.backupDestinationDirs, machine) / RelPath(p)
     }
 
     override def toString = s"BackupDestinationDir(machine = $machine, mountType = $mountType, " +
@@ -102,14 +112,28 @@ package object impl {
 
   }
 
+  object BackupDef {
+
+    def apply[P <: BasePath](name: String,
+              source: intf.BackupSource[P],
+              destinations: Seq[intf.BackupDestination]): BackupDef[P] = {
+
+      new BackupDef[P](name, source, destinations map {d => d.copyForBackup(name)})
+    }
+  }
   /**
     * Backup definition
     */
-  sealed case class BackupDef[P <: BasePath](name: String,
-                       source: intf.BackupSource[P],
-                       destinations: Seq[intf.BackupDestination])
+  sealed class BackupDef[P <: BasePath] private (_name: String,
+                       _source: intf.BackupSource[P],
+                       _destinations: Seq[intf.BackupDestination])
     extends intf.BackupDef[P] {
 
+    override def name: String = _name
+
+    override def source: intf.BackupSource[P] = _source
+
+    override def destinations: Seq[BackupDestination] = _destinations
 
     /**
       * Full path to the (local) "backup directory"
@@ -168,7 +192,7 @@ package object impl {
           case d:intf.BackupDestinationDir =>
             s"DestName ${d.machine.name}\n" +
               s"Type Dir\n" +
-              s"Dir ${d.localMountPath}/${backup.name}\n\n"
+              s"Dir ${d.localMountPath}/${backup.name}\n"
 
           case d:intf.BackupDestinationB2 =>
             s"DestName ${d.machine.name}\n" +

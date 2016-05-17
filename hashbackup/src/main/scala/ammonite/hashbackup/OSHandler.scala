@@ -44,7 +44,8 @@ object OSHandler {
   /**
     *
     */
-  def mountDirAs[P <: BasePath](mountable: intf.Mountable[P], user : User) : \/[Path, intf.MountError] = {
+  def mountDirAs[P <: BasePath](mountable: intf.Mountable[P], user : User) : \/[Path, intf
+  .MountError] = {
 
     def executeCmd(command: String): \/[Path, intf.MountError] = {
 
