@@ -1,9 +1,8 @@
 package ammonite.hashbackup
 
-import java.nio.file.{StandardOpenOption, FileSystemException}
+import java.nio.file.{FileSystemException}
 import java.nio.file.attribute.PosixFilePermission._
 
-import ammonite.hashbackup.impl.BackupDestinationDir
 import ammonite.ops._
 import ammonite.ops.ImplicitWd._
 import ammonite.hashbackup.intf._
@@ -65,7 +64,7 @@ object OSHandler {
         val shareName: String = mountable.shareName
         val localPath = mountable.localMountPath.toString
 
-        val cmd = s"sudo sshfs -o uid=${user.UID},gid=${user.GID},reconnect " +
+        val cmd = s"sudo sshfs -o uid=${user.UID},gid=${user.GID},reconnect,allow_other " +
                   s"${mountable.machine.address}:/$shareName $localPath"
         println(s"\n>>> Executing >>> $cmd")
 
@@ -77,7 +76,7 @@ object OSHandler {
 
         val cmd = s"sudo mount -t cifs -o user=${user.name} " +
                   s"//${mountable.machine.address}/$shareName $localPath"
-        println(s"Executing $cmd")
+        println(s"\n>>> Executing >>> $cmd")
 
         executeCmd(cmd)
 

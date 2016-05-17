@@ -191,12 +191,12 @@ package object impl {
         d match {
           case d:intf.BackupDestinationDir =>
             s"DestName ${d.machine.name}\n" +
-              s"Type Dir\n" +
+              "Type Dir\n" +
               s"Dir ${d.localMountPath}/${backup.name}\n"
 
           case d:intf.BackupDestinationB2 =>
             s"DestName ${d.machine.name}\n" +
-              s"Type B2\n" +
+              "Type B2\n" +
               s"Dir ${d.localMountPath}/${backup.name}\n"
 
           case _ =>
