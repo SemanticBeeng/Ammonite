@@ -197,7 +197,7 @@ package object impl {
         s" hb init     -c $localPath",
         s" hb audit    -c $localPath -a",
         s" hb config   -c $localPath arc-size-limit 1gb",
-        s" hb config   -c $localPath cache-size-limit 100g",
+        s" hb config   -c $localPath cache-size-limit 3g",
         s" hb config   -c $localPath remote-update normal",
         s" hb rekey    -c $localPath -k $key -p ask"
       )
@@ -210,7 +210,8 @@ package object impl {
 
       val cmdOther = List(
         s" hb selftest -c $localPath -v5 $sourcePathsAsText",
-        s" hb dest     -c $localPath sync"
+        s" hb dest     -c $localPath sync",
+        s" hb clear    -c $localPath "
       )
 
       (cmdsInit, cmdExec, cmdOther)

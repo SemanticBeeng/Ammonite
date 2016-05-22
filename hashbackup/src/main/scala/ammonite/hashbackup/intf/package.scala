@@ -49,12 +49,6 @@ package object intf {
 
   trait BackupLocalSrcDir extends BackupSrcDir[Path] with Local
 
-  // -----------------------------------------------------------
-  /**
-    * A "backup source directory"; Can be local or remotely mounted
-    */
-  trait BackupRemoteDir extends BackupDir[BasePath] with Remote
-
   /**
     * A "backup source directory"; Can be local or remotely mounted
     */

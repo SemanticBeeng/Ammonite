@@ -133,7 +133,7 @@ object Backups {
         name = "pure_data",
         source = BackupSource[Path](machine = bigdatafierce_vm,
           shareDir = BackupLocalSrcDir(root),
-          dirs = Seq(BackupSrcDir(RelPath("datascience/marketdata"))),
+          dirs = Seq(BackupSrcDir(RelPath("data/marketdata/UW-advancedtrading/archives"))),
           mountType = LOCAL),
         destinations = naz1AndHz1)
 
