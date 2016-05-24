@@ -141,7 +141,7 @@ object Backups {
         name = "nickdsc_user_home",
         source = BackupSource[Path](machine = bigdatafierce_vm,
           shareDir = BackupLocalSrcDir(root/'home/'nickdsc),
-          dirs = Seq(BackupSrcDir(RelPath(".bash")),
+          dirs = Seq(BackupSrcDir(RelPath(".bash*")),
             BackupSrcDir(RelPath(".vim")),
             BackupSrcDir(RelPath(".smbcredentials")),
             BackupSrcDir(RelPath(".IntelliJIdea15"))),
@@ -176,7 +176,7 @@ object Backups {
       name = "domainspec_user_home",
       source = BackupSource[Path](machine = bigdatafierce_hz1,
         shareDir = BackupSrcDir(root/'home/'domainspec),
-        dirs = Seq(BackupSrcDir(".bash")),
+        dirs = Seq(BackupSrcDir(".bash*")),
         mountType = LOCAL),
       destinations = Seq(storagebox_hz1_destBackup))
 

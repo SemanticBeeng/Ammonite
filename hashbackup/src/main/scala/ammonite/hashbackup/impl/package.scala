@@ -122,7 +122,7 @@ package object impl {
 
     def sourcePaths: Seq[Path] = source.dirs map { d => source.localMountPath / d.path }
 
-    def sourcePathsAsText :String = sourcePaths.mkString(", ")
+    def sourcePathsAsText :String = sourcePaths.mkString(" ")
 
     /**
       *
@@ -211,6 +211,7 @@ package object impl {
       val cmdOther = List(
         s" hb selftest -c $localPath -v5 $sourcePathsAsText",
         s" hb dest     -c $localPath sync",
+        s" hb mount    -c $localPath $mountPath -f -a ",
         s" hb clear    -c $localPath "
       )
 
