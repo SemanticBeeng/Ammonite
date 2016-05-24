@@ -156,7 +156,15 @@ object Backups {
           mountType = LOCAL),
         destinations = naz1AndHz1)
 
-      Seq(pure_dataBackup, nickdsc_user_homeBackup, nickdsc_keysBackup)
+      val projectsBackup = BackupDef(
+        name = "projects",
+        source = BackupSource[Path](machine = bigdatafierce_vm,
+          shareDir = BackupLocalSrcDir(root/'datascience/'projects),
+          dirs = Seq(BackupSrcDir(RelPath("*"))),
+          mountType = LOCAL),
+        destinations = naz1AndHz1)
+
+      Seq(pure_dataBackup, nickdsc_user_homeBackup, nickdsc_keysBackup, projectsBackup)
   }
 
   /**
