@@ -159,7 +159,7 @@ object Backups {
       val projectsBackup = BackupDef(
         name = "projects",
         source = BackupSource[Path](machine = bigdatafierce_vm,
-          shareDir = BackupLocalSrcDir(root/'datascience/'projects),
+          shareDir = BackupLocalSrcDir(root/'development/'projects),
           dirs = Seq(BackupSrcDir(RelPath("*"))),
           mountType = LOCAL),
         destinations = naz1AndHz1)
