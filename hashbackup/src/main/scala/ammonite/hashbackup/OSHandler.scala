@@ -64,7 +64,7 @@ object OSHandler {
         val shareName: String = mountable.shareName
         val localPath = mountable.localMountPath.toString
 
-        val cmd = s"sudo sshfs -o uid=${user.UID},gid=${user.GID},reconnect " +
+        val cmd = s"/*sudo*/ sshfs -o uid=${user.UID},gid=${user.GID},reconnect " +
                   s"${mountable.machine.address}:/$shareName $localPath"
         println(s"\n>>> Executing >>> $cmd")
 
@@ -74,7 +74,7 @@ object OSHandler {
         val shareName: String = mountable.shareName
         val localPath = mountable.localMountPath.toString
 
-        val cmd = s"sudo mount -t cifs -o user=${user.name} " +
+        val cmd = s"/*sudo*/ mount -t cifs -o user=${user.name} " +
                   s"//${mountable.machine.address}/$shareName $localPath"
         println(s"\n>>> Executing >>> $cmd")
 
