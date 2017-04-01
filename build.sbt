@@ -3,7 +3,7 @@ import sbtassembly.AssemblyPlugin.defaultShellScript
 
 
 
-scalaVersion := "2.11.6"
+scalaVersion := "2.11.8"
 
 crossScalaVersions := Seq(
   "2.10.3", "2.10.4", "2.10.5", "2.10.6",
